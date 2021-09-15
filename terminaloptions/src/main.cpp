@@ -2,9 +2,11 @@
 #include <ostream>
 
 #include "../libs/cxxopts/include/cxxopts.hpp"
+#include "config.h"
 
 int main(int argc, char** argv) {
-  cxxopts::Options options("TerminalOptions", "Just a test to parse options");
+  std::string version_number{VERSION_NUMBER};
+  cxxopts::Options options("TerminalOptions", version_number);
 
   options.add_options()("b,bar", "Param bar", cxxopts::value<std::string>())(
       "d,debug", "Enable debugging",
