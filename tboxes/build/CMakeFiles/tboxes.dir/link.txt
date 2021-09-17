@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -rdynamic CMakeFiles/tboxes.dir/src/main.cpp.o CMakeFiles/tboxes.dir/src/config.cpp.o -o tboxes 
