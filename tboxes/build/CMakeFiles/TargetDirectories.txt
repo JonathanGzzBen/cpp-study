@@ -1,3 +1,0 @@
-/home/jonark/programming/cpp-study/tboxes/build/CMakeFiles/rebuild_cache.dir
-/home/jonark/programming/cpp-study/tboxes/build/CMakeFiles/edit_cache.dir
-/home/jonark/programming/cpp-study/tboxes/build/CMakeFiles/tboxes.dir
