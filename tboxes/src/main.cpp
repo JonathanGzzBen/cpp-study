@@ -1,52 +1,68 @@
 #include <iostream>
 #include <vector>
 
-#include "../libs/cxxopts/include/cxxopts.hpp"
 #include "config.h"
+#include "toybox.h"
+
+std::vector<ToyBox*> toyboxes;
+void print_menu();
 
 int main(int argc, char** argv) {
-  cxxopts::Options options("tboxes", config::get_version_name());
-
-  options.add_options()("c,create-box", "Create toy box",
-                        cxxopts::value<std::string>())(
-      "l,list-boxes", "List boxes")("d,display-box", "Display box contents",
-                                    cxxopts::value<std::string>())(
-      "a,add-to-box", "Box to which to add figure",
-      cxxopts::value<std::string>())(
-      "t,triangle", "Add triangle with specified base and height",
-      cxxopts::value<std::vector<int>>()->implicit_value("1,1"))("h,help",
-                                                                 "Print usage");
-
-  auto result = options.parse(argc, argv);
-
-  if (result.count("help")) {
-    std::cout << options.help() << std::endl;
-    exit(0);
-  }
-  if (result.count("list-boxes")) {
-    std::cout << "Boxes:" << std::endl;
-    return 0;
-  }
-  if (result.count("display-box")) {
-    std::string box_name{result["display-box"].as<std::string>()};
-    std::cout << "Displaying contents of box " << box_name << std::endl;
-    return 0;
-  }
-  if (result.count("create-box")) {
-    std::string bar;
-    bar = result["create-box"].as<std::string>();
-    std::cout << "name of box to create: " << bar << std::endl;
-  }
-  if (result.count("add-to-box")) {
-    std::string target_box{result["add-to-box"].as<std::string>()};
-    std::cout << "Adding figures to: " << target_box << std::endl;
-    if (result.count("triangle")) {
-      std::vector<int> triangle_measures{
-          result["triangle"].as<std::vector<int>>()};
-      std::cout << "Triangle base:" << triangle_measures.at(0) << std::endl;
-      std::cout << "Triangle height:" << triangle_measures.at(1) << std::endl;
+  char input{'\0'};
+  do {
+    print_menu();
+    std::cout << "Selection: ";
+    std::cin >> input;
+    switch (input) {
+      case 'c':
+      case 'C': {
+        std::cout << "Enter box name: ";
+        std::string box_name;
+        std::cin >> box_name;
+        ToyBox* new_box = new ToyBox{box_name};
+        std::cout << "Created ToyBox " << new_box->get_name() << std::endl;
+        toyboxes.push_back(new_box);
+        break;
+      }
+      case 'l':
+      case 'L': {
+        std::cout << "Boxes:" << std::endl;
+        break;
+      }
+      case 'd':
+      case 'D': {
+        std::cout << "Which box do you want to display?: ";
+        std::string box_name;
+        std::cin >> box_name;
+        std::cout << "Displaying contents of box " << box_name << std::endl;
+      }
+      case 't':
+      case 'T': {
+        std::cout << "Enter measures of new triangle" << std::endl;
+        std::cout << "Triangle base: ";
+        int triangle_base{0};
+        std::cin >> triangle_base;
+        std::cout << "Triangle height: ";
+        int triangle_height{0};
+        std::cin >> triangle_height;
+        auto* triangle = new Triangle{triangle_base, triangle_height};
+        std::cout << *triangle << std::endl;
+      }
     }
-    return 0;
+    std::cout << std::endl << std::endl;
+  } while (input != 'q' && input != 'Q');
+
+  for (const auto& box : toyboxes) {
+    delete box;
   }
   return 0;
+}
+
+void print_menu() {
+  std::cout << "tboxes " << config::get_version_name() << std::endl;
+  std::cout << "c  - Create ToyBox" << std::endl;
+  std::cout << "l  - List ToyBoxes" << std::endl;
+  std::cout << "d  - Display ToyBox contents" << std::endl;
+  std::cout << "at - Add Triangle to ToyBox" << std::endl;
+  std::cout << "q  - Quit" << std::endl << std::endl;
 }

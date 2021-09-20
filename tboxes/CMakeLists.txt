@@ -27,6 +27,10 @@ add_definitions(-DVERSION_NAME="v1.0.0")
 
 set(SOURCES src/main.cpp
             src/config.cpp
+            src/toybox.cpp
+            src/triangle.cpp
+            src/toybox.h
+            src/triangle.h
             src/config.h
             libs/cxxopts/include/cxxopts.hpp)
 
