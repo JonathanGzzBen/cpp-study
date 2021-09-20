@@ -20,4 +20,4 @@ bool ToyBox::set_name(std::string name) {
   return true;
 }
 
-std::vector<Triangle *> ToyBox::get_triangles() { return this->triangles; }
+std::vector<Triangle *> &ToyBox::get_triangles() { return this->triangles; }

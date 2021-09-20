@@ -16,7 +16,7 @@ class ToyBox {
   ~ToyBox();
   std::string get_name() const;
   bool set_name(std::string name);
-  std::vector<Triangle*> get_triangles();
+  std::vector<Triangle*>& get_triangles();
 };
 
 #endif  // TBOXES_SRC_TOYBOX_H_
