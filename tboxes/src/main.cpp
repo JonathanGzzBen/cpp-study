@@ -6,10 +6,10 @@
 
 std::vector<ToyBox*> toyboxes;
 void print_menu();
-void add_box(std::vector<ToyBox*>& toyboxes);
+void add_box(std::vector<ToyBox*>* toyboxes);
 void list_toyboxes(const std::vector<ToyBox*>& toyboxes);
 void display_toybox(const std::vector<ToyBox*>& toyboxes);
-void add_triangle(std::vector<ToyBox*>& toyboxes);
+void add_triangle(const std::vector<ToyBox*>* toyboxes);
 
 int main(int argc, char** argv) {
   char input{'\0'};
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     switch (input) {
       case 'c':
       case 'C': {
-        add_box(toyboxes);
+        add_box(&toyboxes);
         break;
       }
       case 'l':
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
       }
       case 't':
       case 'T': {
-        add_triangle(toyboxes);
+        add_triangle(&toyboxes);
       }
     }
     std::cout << std::endl << std::endl;
@@ -55,13 +55,13 @@ void print_menu() {
   std::cout << "q  - Quit" << std::endl << std::endl;
 }
 
-void add_box(std::vector<ToyBox*> &toyboxes) {
+void add_box(std::vector<ToyBox*>* toyboxes) {
   std::cout << "Enter box name: ";
   std::string box_name;
   std::cin >> box_name;
   ToyBox* new_box = new ToyBox{box_name};
   std::cout << "Created ToyBox " << new_box->get_name() << std::endl;
-  toyboxes.push_back(new_box);
+  toyboxes->push_back(new_box);
 }
 
 void list_toyboxes(const std::vector<ToyBox*>& toyboxes) {
@@ -75,7 +75,7 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes) {
   std::cout << "Displaying contents of box " << box_name << std::endl;
 }
 
-void add_triangle(std::vector<ToyBox*>& toyboxes) {
+void add_triangle(const std::vector<ToyBox*>* toyboxes) {
   std::cout << "Enter measures of new triangle" << std::endl;
   std::cout << "Triangle base: ";
   int triangle_base{0};
@@ -85,4 +85,14 @@ void add_triangle(std::vector<ToyBox*>& toyboxes) {
   std::cin >> triangle_height;
   auto* triangle = new Triangle{triangle_base, triangle_height};
   std::cout << *triangle << std::endl;
+
+  std::cout << "Target box: ";
+  std::string target_box;
+  std::cin >> target_box;
+  for (const auto& box : *toyboxes) {
+    if (box->get_name() == target_box) {
+      box->get_triangles().push_back(triangle);
+      break;
+    }
+  }
 }
