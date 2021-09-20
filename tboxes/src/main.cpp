@@ -6,10 +6,10 @@
 
 std::vector<ToyBox*> toyboxes;
 void print_menu();
-void add_box(std::vector<ToyBox*>* toyboxes);
+void add_box(std::vector<ToyBox*>* const toyboxes);
 void list_toyboxes(const std::vector<ToyBox*>& toyboxes);
 void display_toybox(const std::vector<ToyBox*>& toyboxes);
-void add_triangle(const std::vector<ToyBox*>* toyboxes);
+void add_triangle(std::vector<ToyBox*>* const toyboxes);
 
 int main(int argc, char** argv) {
   char input{'\0'};
@@ -55,7 +55,7 @@ void print_menu() {
   std::cout << "q  - Quit" << std::endl << std::endl;
 }
 
-void add_box(std::vector<ToyBox*>* toyboxes) {
+void add_box(std::vector<ToyBox*>* const toyboxes) {
   std::cout << "Enter box name: ";
   std::string box_name;
   std::cin >> box_name;
@@ -75,7 +75,7 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes) {
   std::cout << "Displaying contents of box " << box_name << std::endl;
 }
 
-void add_triangle(const std::vector<ToyBox*>* toyboxes) {
+void add_triangle(std::vector<ToyBox*>* const toyboxes) {
   std::cout << "Enter measures of new triangle" << std::endl;
   std::cout << "Triangle base: ";
   int triangle_base{0};
