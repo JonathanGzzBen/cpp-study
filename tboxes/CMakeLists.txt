@@ -25,13 +25,14 @@ endif()
 
 add_definitions(-DVERSION_NAME="v1.0.0")
 
+include_directories(${CMAKE_SOURCE_DIR})
+
 set(SOURCES src/main.cpp
             src/config.cpp
             src/toybox.cpp
             src/triangle.cpp
-            src/toybox.h
-            src/triangle.h
             src/config.h
-            libs/cxxopts/include/cxxopts.hpp)
+            src/toybox.h
+            src/triangle.h)
 
 add_executable(${PROJECT_NAME} ${SOURCES})

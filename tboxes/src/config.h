@@ -4,6 +4,7 @@
 #define VERSION_NAME "v0.0.0"
 #endif
 #include <iostream>
+#include <string>
 
 namespace config {
 std::string get_version_name();

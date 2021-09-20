@@ -1,4 +1,4 @@
-#include "triangle.h"
+#include "src/triangle.h"
 
 Triangle::Triangle(int base, int height) {
   this->base = base;

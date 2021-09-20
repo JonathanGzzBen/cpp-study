@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
 
-#include "config.h"
-#include "toybox.h"
+#include "src/config.h"
+#include "src/toybox.h"
 
 std::vector<ToyBox*> toyboxes;
 void print_menu();

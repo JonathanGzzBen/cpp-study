@@ -1,9 +1,10 @@
 #ifndef TBOXES_SRC_TOYBOX_H_
 #define TBOXES_SRC_TOYBOX_H_
 #include <iostream>
+#include <string>
 #include <vector>
 
-#include "triangle.h"
+#include "src/triangle.h"
 
 class ToyBox {
  private:
@@ -11,7 +12,7 @@ class ToyBox {
   std::vector<Triangle*> triangles;
 
  public:
-  ToyBox(std::string name);
+  explicit ToyBox(std::string name);
   ~ToyBox();
   std::string get_name() const;
   bool set_name(std::string name);
