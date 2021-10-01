@@ -6,7 +6,7 @@ Triangle::Triangle(int base, int height) {
 }
 
 Triangle::~Triangle() {
-    std::cout<<"Deleting Triangle: " << *this << std::endl;
+  std::cout << "Deleting Triangle: " << *this << std::endl;
 }
 
 int Triangle::get_area() const { return (this->base * this->height) / 2; }
