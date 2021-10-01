@@ -9,6 +9,7 @@ class Triangle {
 
  public:
   Triangle(int base, int height);
+  ~Triangle();
   int get_area() const;
   friend std::ostream &operator<<(std::ostream &os, const Triangle &triangle);
 };

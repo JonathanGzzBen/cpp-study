@@ -1,10 +1,10 @@
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "src/config.h"
 #include "src/toybox.h"
 
-std::vector<ToyBox*> toyboxes;
 void print_menu();
 void add_box(std::vector<ToyBox*>* const toyboxes);
 void list_toyboxes(const std::vector<ToyBox*>& toyboxes);
@@ -12,6 +12,7 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes);
 void add_triangle(std::vector<ToyBox*>* const toyboxes);
 
 int main(int argc, char** argv) {
+  std::vector<ToyBox*> toyboxes;
   char input{'\0'};
   do {
     print_menu();
@@ -97,15 +98,15 @@ void add_triangle(std::vector<ToyBox*>* const toyboxes) {
   std::cout << "Triangle height: ";
   int triangle_height{0};
   std::cin >> triangle_height;
-  auto* triangle = new Triangle{triangle_base, triangle_height};
+  auto triangle = std::make_unique<Triangle>(triangle_base, triangle_height);
 
   std::cout << "Target box: ";
   std::string target_box;
   std::cin >> target_box;
   for (const auto& box : *toyboxes) {
     if (box->get_name() == target_box) {
-      box->get_triangles().push_back(triangle);
-      break;
+      box->get_triangles().push_back(std::move(triangle));
+      return;
     }
   }
 }

@@ -1,15 +1,12 @@
 #include "src/toybox.h"
 
 #include <iostream>
+#include <memory>
 #include <string>
 
 ToyBox::ToyBox(std::string name) : name{name} {}
 
 ToyBox::~ToyBox() {
-  for (const auto &triangle : this->triangles) {
-    std::cout << "Deleting triangle" << std::endl;
-    delete triangle;
-  }
   std::cout << "Deleted toybox: " << this->name << std::endl;
 }
 
@@ -20,4 +17,4 @@ bool ToyBox::set_name(std::string name) {
   return true;
 }
 
-std::vector<Triangle *> &ToyBox::get_triangles() { return this->triangles; }
+std::vector<std::unique_ptr<Triangle>> &ToyBox::get_triangles() { return this->triangles; }
