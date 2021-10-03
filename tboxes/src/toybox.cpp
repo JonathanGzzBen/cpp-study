@@ -17,6 +17,6 @@ bool ToyBox::set_name(std::string name) {
   return true;
 }
 
-std::vector<std::unique_ptr<Triangle>> &ToyBox::get_triangles() {
-  return this->triangles;
+std::vector<std::unique_ptr<I_Figure>> &ToyBox::get_figures() {
+  return this->figures;
 }

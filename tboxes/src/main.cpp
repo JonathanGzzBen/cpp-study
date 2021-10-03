@@ -3,13 +3,17 @@
 #include <vector>
 
 #include "src/config.h"
+#include "src/square.h"
 #include "src/toybox.h"
+#include "src/triangle.h"
 
 void print_menu();
 void add_box(std::vector<ToyBox*>* const toyboxes);
 void list_toyboxes(const std::vector<ToyBox*>& toyboxes);
 void display_toybox(const std::vector<ToyBox*>& toyboxes);
+void add_figure(std::vector<ToyBox*>* const toyboxes);
 void add_triangle(std::vector<ToyBox*>* const toyboxes);
+void add_square(std::vector<ToyBox*>* const toyboxes);
 
 int main(int argc, char** argv) {
   std::vector<ToyBox*> toyboxes;
@@ -35,9 +39,9 @@ int main(int argc, char** argv) {
         display_toybox(toyboxes);
         break;
       }
-      case 't':
-      case 'T': {
-        add_triangle(&toyboxes);
+      case 'f':
+      case 'F': {
+        add_figure(&toyboxes);
         break;
       }
     }
@@ -55,7 +59,7 @@ void print_menu() {
   std::cout << "c  - Create ToyBox" << std::endl;
   std::cout << "l  - List ToyBoxes" << std::endl;
   std::cout << "d  - Display ToyBox contents" << std::endl;
-  std::cout << "t - Add Triangle to ToyBox" << std::endl;
+  std::cout << "f - Add new Figure to ToyBox" << std::endl;
   std::cout << "q  - Quit" << std::endl << std::endl;
 }
 
@@ -81,15 +85,39 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes) {
   std::cin >> box_name;
   for (const auto& toybox : toyboxes) {
     if (toybox->get_name() == box_name) {
-      std::cout << "Triangles:" << std::endl;
-      for (const auto& triangle : toybox->get_triangles()) {
-        std::cout << *triangle << std::endl;
+      std::cout << "Figures:" << std::endl;
+      for (const auto& figure : toybox->get_figures()) {
+        std::cout << *figure << std::endl;
       }
       std::cout << std::endl;
       return;
     }
   }
   std::cout << "No box with that name found." << std::endl;
+}
+
+void add_figure(std::vector<ToyBox*>* const toyboxes) {
+  std::cout << "Which figure do you wish to add? " << config::get_version_name()
+            << std::endl;
+  std::cout << "t  - Triangle" << std::endl;
+  std::cout << "s  - Square" << std::endl;
+  std::cout << "q  - Cancel" << std::endl << std::endl;
+
+  std::cout << "Selection: ";
+  char selection{'\0'};
+  std::cin >> selection;
+  switch (selection) {
+    case 't':
+    case 'T': {
+      add_triangle(toyboxes);
+      break;
+    }
+    case 's':
+    case 'S': {
+      add_square(toyboxes);
+      break;
+    }
+  }
 }
 
 void add_triangle(std::vector<ToyBox*>* const toyboxes) {
@@ -107,7 +135,26 @@ void add_triangle(std::vector<ToyBox*>* const toyboxes) {
   std::cin >> target_box;
   for (const auto& box : *toyboxes) {
     if (box->get_name() == target_box) {
-      box->get_triangles().push_back(std::move(triangle));
+      box->get_figures().push_back(std::move(triangle));
+      return;
+    }
+  }
+  std::cout << "No box with that name found." << std::endl;
+}
+
+void add_square(std::vector<ToyBox*>* const toyboxes) {
+  std::cout << "Enter measures of new square" << std::endl;
+  std::cout << "Square side length: ";
+  int square_side{0};
+  std::cin >> square_side;
+  auto square = std::make_unique<Square>(square_side);
+
+  std::cout << "Target box: ";
+  std::string target_box;
+  std::cin >> target_box;
+  for (const auto& box : *toyboxes) {
+    if (box->get_name() == target_box) {
+      box->get_figures().push_back(std::move(square));
       return;
     }
   }

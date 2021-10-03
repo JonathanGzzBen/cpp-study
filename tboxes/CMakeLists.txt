@@ -31,11 +31,13 @@ set(SOURCES src/main.cpp
             src/config.cpp
             src/toybox.cpp
             src/triangle.cpp
+            src/square.cpp
             src/i_figure.cpp
             src/i_printable.cpp
             src/config.h
             src/toybox.h
             src/triangle.h
+            src/square.h
             src/i_figure.h
             src/i_printable.h
             )
