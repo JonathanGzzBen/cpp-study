@@ -9,5 +9,6 @@ Triangle::~Triangle() {
 int Triangle::get_area() const { return (this->base * this->height) / 2; }
 
 void Triangle::print(std::ostream &os) const {
-  os << "Triangle[Base:" << this->base << " Height:" << this->height << "]";
+  os << "Triangle[Base:" << this->base << " Height:" << this->height
+     << " Area:" << this->get_area() << "]";
 }
