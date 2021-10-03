@@ -55,7 +55,7 @@ void print_menu() {
   std::cout << "c  - Create ToyBox" << std::endl;
   std::cout << "l  - List ToyBoxes" << std::endl;
   std::cout << "d  - Display ToyBox contents" << std::endl;
-  std::cout << "at - Add Triangle to ToyBox" << std::endl;
+  std::cout << "t - Add Triangle to ToyBox" << std::endl;
   std::cout << "q  - Quit" << std::endl << std::endl;
 }
 
@@ -86,8 +86,10 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes) {
         std::cout << *triangle << std::endl;
       }
       std::cout << std::endl;
+      return;
     }
   }
+  std::cout << "No box with that name found." << std::endl;
 }
 
 void add_triangle(std::vector<ToyBox*>* const toyboxes) {
@@ -109,4 +111,5 @@ void add_triangle(std::vector<ToyBox*>* const toyboxes) {
       return;
     }
   }
+  std::cout << "No box with that name found." << std::endl;
 }

@@ -1,9 +1,6 @@
 #include "src/triangle.h"
 
-Triangle::Triangle(int base, int height) {
-  this->base = base;
-  this->height = height;
-}
+Triangle::Triangle(int base, int height) : base{base}, height{height} {}
 
 Triangle::~Triangle() {
   std::cout << "Deleting Triangle: " << *this << std::endl;
@@ -11,6 +8,6 @@ Triangle::~Triangle() {
 
 int Triangle::get_area() const { return (this->base * this->height) / 2; }
 
-std::ostream &operator<<(std::ostream &os, const Triangle &triangle) {
-  return os << "Base: " << triangle.base << " Height: " << triangle.height;
+void Triangle::print(std::ostream &os) const {
+  os << "Base: " << this->base << " Height: " << this->height;
 }

@@ -1,17 +1,20 @@
 #ifndef TBOXES_SRC_TRIANGLE_H_
 #define TBOXES_SRC_TRIANGLE_H_
 #include <iostream>
+#include <ostream>
 
-class Triangle {
+#include "src/i_figure.h"
+
+class Triangle : public I_Figure {
  private:
   int base;
   int height;
 
  public:
   Triangle(int base, int height);
-  ~Triangle();
-  int get_area() const;
-  friend std::ostream &operator<<(std::ostream &os, const Triangle &triangle);
+  virtual ~Triangle();
+  int get_area() const override;
+  void print(std::ostream &os) const override;
 };
 
 #endif  // TBOXES_SRC_TRIANGLE_H_
