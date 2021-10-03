@@ -85,9 +85,25 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes) {
   std::cin >> box_name;
   for (const auto& toybox : toyboxes) {
     if (toybox->get_name() == box_name) {
-      std::cout << "Figures:" << std::endl;
+      std::vector<Triangle*> triangles{};
+      std::vector<Square*> squares{};
       for (const auto& figure : toybox->get_figures()) {
-        std::cout << *figure << std::endl;
+        auto triangle{dynamic_cast<Triangle*>(figure.get())};
+        if (triangle != nullptr) {
+          triangles.push_back(triangle);
+        }
+        auto square{dynamic_cast<Square*>(figure.get())};
+        if (square != nullptr) {
+          squares.push_back(square);
+        }
+      }
+      std::cout << "Triangles:" << std::endl;
+      for (const auto& triangle : triangles) {
+        std::cout << *triangle << std::endl;
+      }
+      std::cout << "Squares:" << std::endl;
+      for (const auto& square : squares) {
+        std::cout << *square << std::endl;
       }
       std::cout << std::endl;
       return;
