@@ -10,7 +10,7 @@ class Square : public I_Figure {
   int side;
 
  public:
-  Square(int side);
+  explicit Square(int side);
   virtual ~Square();
   int get_area() const override;
   void print(std::ostream &os) const override;

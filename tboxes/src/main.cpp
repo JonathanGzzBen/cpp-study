@@ -3,8 +3,10 @@
 #include <vector>
 
 #include "src/config.h"
+#include "src/invalid_measures_exception.h"
 #include "src/square.h"
 #include "src/toybox.h"
+#include "src/toybox_not_found.h"
 #include "src/triangle.h"
 
 void print_menu();
@@ -14,6 +16,10 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes);
 void add_figure(std::vector<ToyBox*>* const toyboxes);
 void add_triangle(std::vector<ToyBox*>* const toyboxes);
 void add_square(std::vector<ToyBox*>* const toyboxes);
+std::unique_ptr<Triangle> read_triangle();
+std::unique_ptr<Square> read_square();
+ToyBox& find_box(const std::string box_name,
+                 const std::vector<ToyBox*>& toyboxes);
 
 int main(int argc, char** argv) {
   std::vector<ToyBox*> toyboxes;
@@ -137,42 +143,70 @@ void add_figure(std::vector<ToyBox*>* const toyboxes) {
 }
 
 void add_triangle(std::vector<ToyBox*>* const toyboxes) {
-  std::cout << "Enter measures of new triangle" << std::endl;
+  try {
+    std::cout << "Enter measures of new triangle:" << std::endl;
+    auto triangle{read_triangle()};
+    std::cout << "Target box: ";
+    std::string target_box;
+    std::cin >> target_box;
+    auto box{find_box(target_box, *toyboxes)};
+    box.get_figures().push_back(std::move(triangle));
+  } catch (InvalidMeasuresException& ex) {
+    std::cout << ex.what() << std::endl;
+  } catch (ToyBoxNotFound& ex) {
+    std::cout << ex.what() << std::endl;
+  }
+}
+
+void add_square(std::vector<ToyBox*>* const toyboxes) {
+  std::cout << "Enter measures of new square:" << std::endl;
+  try {
+    auto square{read_square()};
+    std::cout << "Target box: ";
+    std::string target_box;
+    std::cin >> target_box;
+    auto box = find_box(target_box, *toyboxes);
+    box.get_figures().push_back(std::move(square));
+  } catch (InvalidMeasuresException& ex) {
+    std::cout << ex.what() << std::endl;
+  } catch (ToyBoxNotFound& ex) {
+    std::cout << ex.what() << std::endl;
+  }
+}
+
+std::unique_ptr<Triangle> read_triangle() {
   std::cout << "Triangle base: ";
   int triangle_base{0};
   std::cin >> triangle_base;
   std::cout << "Triangle height: ";
   int triangle_height{0};
   std::cin >> triangle_height;
-  auto triangle = std::make_unique<Triangle>(triangle_base, triangle_height);
-
-  std::cout << "Target box: ";
-  std::string target_box;
-  std::cin >> target_box;
-  for (const auto& box : *toyboxes) {
-    if (box->get_name() == target_box) {
-      box->get_figures().push_back(std::move(triangle));
-      return;
-    }
+  if (triangle_base <= 0) {
+    throw InvalidMeasuresException{"Base of triangle must be positive"};
+  } else if (triangle_height <= 0) {
+    throw InvalidMeasuresException{"Height of triangle must be positive"};
   }
-  std::cout << "No box with that name found." << std::endl;
+  auto triangle = std::make_unique<Triangle>(triangle_base, triangle_height);
+  return triangle;
 }
 
-void add_square(std::vector<ToyBox*>* const toyboxes) {
-  std::cout << "Enter measures of new square" << std::endl;
+std::unique_ptr<Square> read_square() {
   std::cout << "Square side length: ";
   int square_side{0};
   std::cin >> square_side;
+  if (square_side <= 0) {
+    throw InvalidMeasuresException{"Sides of square must be positive values"};
+  }
   auto square = std::make_unique<Square>(square_side);
+  return square;
+}
 
-  std::cout << "Target box: ";
-  std::string target_box;
-  std::cin >> target_box;
-  for (const auto& box : *toyboxes) {
-    if (box->get_name() == target_box) {
-      box->get_figures().push_back(std::move(square));
-      return;
+ToyBox& find_box(const std::string box_name,
+                 const std::vector<ToyBox*>& toyboxes) {
+  for (const auto& box : toyboxes) {
+    if (box->get_name() == box_name) {
+      return *box;
     }
   }
-  std::cout << "No box with that name found." << std::endl;
+  throw ToyBoxNotFound{box_name};
 }

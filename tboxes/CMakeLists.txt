@@ -34,12 +34,16 @@ set(SOURCES src/main.cpp
             src/square.cpp
             src/i_figure.cpp
             src/i_printable.cpp
+            src/invalid_measures_exception.cpp
+            src/toybox_not_found.cpp
             src/config.h
             src/toybox.h
             src/triangle.h
             src/square.h
             src/i_figure.h
             src/i_printable.h
+            src/invalid_measures_exception.h
+            src/toybox_not_found.h
             )
 
 
