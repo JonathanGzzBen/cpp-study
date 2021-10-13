@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -18,7 +19,7 @@ void add_triangle(std::vector<ToyBox*>* const toyboxes);
 void add_square(std::vector<ToyBox*>* const toyboxes);
 std::unique_ptr<Triangle> read_triangle();
 std::unique_ptr<Square> read_square();
-ToyBox& find_box(const std::string box_name,
+ToyBox* find_box(const std::string box_name,
                  const std::vector<ToyBox*>& toyboxes);
 
 int main(int argc, char** argv) {
@@ -105,11 +106,11 @@ void display_toybox(const std::vector<ToyBox*>& toyboxes) {
       }
       std::cout << "Triangles:" << std::endl;
       for (const auto& triangle : triangles) {
-        std::cout << *triangle << std::endl;
+        std::cout << std::setw(20) << *triangle << std::endl;
       }
       std::cout << "Squares:" << std::endl;
       for (const auto& square : squares) {
-        std::cout << *square << std::endl;
+        std::cout << std::setw(20) << *square << std::endl;
       }
       std::cout << std::endl;
       return;
@@ -150,7 +151,7 @@ void add_triangle(std::vector<ToyBox*>* const toyboxes) {
     std::string target_box;
     std::cin >> target_box;
     auto box{find_box(target_box, *toyboxes)};
-    box.get_figures().push_back(std::move(triangle));
+    box->get_figures().push_back(std::move(triangle));
   } catch (InvalidMeasuresException& ex) {
     std::cout << ex.what() << std::endl;
   } catch (ToyBoxNotFound& ex) {
@@ -166,7 +167,7 @@ void add_square(std::vector<ToyBox*>* const toyboxes) {
     std::string target_box;
     std::cin >> target_box;
     auto box = find_box(target_box, *toyboxes);
-    box.get_figures().push_back(std::move(square));
+    box->get_figures().push_back(std::move(square));
   } catch (InvalidMeasuresException& ex) {
     std::cout << ex.what() << std::endl;
   } catch (ToyBoxNotFound& ex) {
@@ -201,11 +202,11 @@ std::unique_ptr<Square> read_square() {
   return square;
 }
 
-ToyBox& find_box(const std::string box_name,
+ToyBox* find_box(const std::string box_name,
                  const std::vector<ToyBox*>& toyboxes) {
   for (const auto& box : toyboxes) {
     if (box->get_name() == box_name) {
-      return *box;
+      return box;
     }
   }
   throw ToyBoxNotFound{box_name};
