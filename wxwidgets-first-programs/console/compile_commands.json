@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/jonark/programming/cpp-study/wxwidgets-first-programs/console/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK__ -isystem /usr/lib/wx/include/gtk2-unicode-3.0 -isystem /usr/include/wx-3.0  -pthread -o CMakeFiles/console.dir/console.cpp.o -c /home/jonark/programming/cpp-study/wxwidgets-first-programs/console/console.cpp",
+  "file": "/home/jonark/programming/cpp-study/wxwidgets-first-programs/console/console.cpp"
+}
+]
