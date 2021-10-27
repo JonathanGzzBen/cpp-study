@@ -11,6 +11,5 @@ bool MyApp::OnInit()
 {
     Simple *simple = new Simple(wxT("Simple"));
     simple->Show(true);
-    delete simple;
     return true;
 }
