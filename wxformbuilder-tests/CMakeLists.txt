@@ -5,7 +5,7 @@ if (WIN32)
     add_link_options(-mwindows)
 endif ()
 
-set(wxWidgets_ROOT_DIR ${WX_PATH})
+#set(wxWidgets_ROOT_DIR ${WX_PATH})
 find_package(wxWidgets REQUIRED COMPONENTS net core base)
 include(${wxWidgets_USE_FILE})
 include_directories(${CMAKE_SOURCE_DIR})
