@@ -10,7 +10,7 @@
 const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
 
-GLuint uniformXMove;
+GLint uniformXMove;
 
 // Vector shader
 static const char *V_SHADER =
@@ -182,7 +182,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shader);
-    glUniform1f((GLint)uniformXMove, triOffset);
+    glUniform1f(uniformXMove, triOffset);
 
     glBindVertexArray(vao);
 
