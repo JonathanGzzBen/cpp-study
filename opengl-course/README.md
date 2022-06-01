@@ -10,5 +10,5 @@ Udemy course.
 To build using MSYS2, GLEW and GLFW are required:
 
 ```shell
-pacman -S mingw-w64-x86_64-glew mingw-w64-x86_64-glfw mingw-w64-glm
+pacman -S mingw-w64-x86_64-glew mingw-w64-x86_64-glfw mingw-w64-x86_64-glm
 ```

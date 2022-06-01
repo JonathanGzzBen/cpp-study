@@ -11,5 +11,8 @@ find_package(glfw3 3.3 REQUIRED)
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIR})
 
-add_executable(main src/main.c)
-target_link_libraries(main OpenGL::GL glfw GLEW::GLEW)
+# GLM
+find_package(glm)
+
+add_executable(main src/main.cpp)
+target_link_libraries(main OpenGL::GL glfw GLEW::GLEW glm)
