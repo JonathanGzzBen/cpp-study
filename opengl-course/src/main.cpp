@@ -3,6 +3,9 @@
 
 #include <array>
 #include <cmath>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -13,16 +16,16 @@ const GLint HEIGHT = 600;
 
 using Program = struct {
   GLuint program;
-  GLint uniformXMove;
+  GLint uniformModel;
 };
 
 // Vector shader
 const static std::string V_SHADER{R"(
     #version 330
     layout (location = 0) in vec3 pos;
-    uniform float xMove;
+    uniform mat4 model;
     void main() {
-        gl_Position = vec4(0.4 * pos.x + xMove, 0.4 * pos.y, pos.z, 1.0);
+        gl_Position = model * vec4(0.4 * pos.x, 0.4 * pos.y, pos.z, 1.0);
     }
 )"};
 
@@ -85,8 +88,8 @@ Program CompileShadersProgram() {
     exit(EXIT_FAILURE);
   }
 
-  auto uniformXMove = glGetUniformLocation(shader, "xMove");
-  return {.program = shader, .uniformXMove = uniformXMove};
+  auto uniformModel = glGetUniformLocation(shader, "model");
+  return {.program = shader, .uniformModel = uniformModel};
 }
 
 // Return VAO
@@ -159,7 +162,7 @@ int main() {
   glViewport(0, 0, bufferWidth, bufferHeight);
 
   GLuint vao = CreateTriangle();
-  auto [program, uniformXMove] = CompileShadersProgram();
+  auto [program, uniformModel] = CompileShadersProgram();
 
   bool direction = true;
   float triOffset = 0.0f;
@@ -179,7 +182,11 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(program);
-    glUniform1f(uniformXMove, triOffset);
+
+    glm::mat4 model(1.0f);
+    model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
+
+    glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(vao);
 
