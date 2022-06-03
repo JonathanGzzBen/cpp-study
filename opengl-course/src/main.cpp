@@ -13,6 +13,7 @@
 // Window dimensions
 const GLint WIDTH = 800;
 const GLint HEIGHT = 600;
+const float TO_RADIANS{3.14159265f / 180.0f};
 
 using Program = struct {
   GLuint program;
@@ -25,7 +26,7 @@ const static std::string V_SHADER{R"(
     layout (location = 0) in vec3 pos;
     uniform mat4 model;
     void main() {
-        gl_Position = model * vec4(0.4 * pos.x, 0.4 * pos.y, pos.z, 1.0);
+        gl_Position = model * vec4(pos, 1.0);
     }
 )"};
 
@@ -166,6 +167,9 @@ int main() {
 
   bool direction = true;
   float triOffset = 0.0f;
+  float curAngle = 0.0f;
+  float curSize = 0.4f;
+  bool sizeDirection = true;
   // Loop until window closed
   while (!glfwWindowShouldClose(mainWindow)) {
     const float triMaxOffset = 0.6f;
@@ -177,6 +181,15 @@ int main() {
 
     if (std::fabs(triOffset) >= triMaxOffset) direction = !direction;
 
+    curAngle = curAngle >= 360 ? curAngle - 360 : curAngle + 0.1f;
+
+    const float maxSize = 0.8f;
+    const float minSize = 0.1f;
+
+    curSize = direction ? curSize + 0.001f : curSize - 0.001f;
+    sizeDirection = (curSize < minSize || maxSize < curSize) ? !sizeDirection
+                                                             : sizeDirection;
+
     // Clear window
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -184,8 +197,10 @@ int main() {
     glUseProgram(program);
 
     glm::mat4 model(1.0f);
+    model =
+        glm::rotate(model, curAngle * TO_RADIANS, glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
-
+    model = glm::scale(model, glm::vec3(curSize, curSize, 1.0f));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(vao);
