@@ -24,18 +24,25 @@ using Program = struct {
 const static std::string V_SHADER{R"(
     #version 330
     layout (location = 0) in vec3 pos;
+
     uniform mat4 model;
+    out vec4 vCol;
+
     void main() {
         gl_Position = model * vec4(pos, 1.0);
+        vCol = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);
     }
 )"};
 
 //  Fragment shader
 const static std::string F_SHADER{R"(
     #version 330
+
     out vec4 colour;
+    in vec4 vCol;
+
     void main() {
-        colour = vec4(1.0, 0.0, 0.0, 1.0);
+        colour = vCol;
     }
 )"};
 
@@ -187,8 +194,7 @@ int main() {
     const float minSize = 0.1f;
 
     curSize = direction ? curSize + 0.001f : curSize - 0.001f;
-    sizeDirection = (curSize < minSize || maxSize < curSize) ? !sizeDirection
-                                                             : sizeDirection;
+    sizeDirection = (curSize < minSize || maxSize < curSize) == !sizeDirection;
 
     // Clear window
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
