@@ -13,7 +13,7 @@ class Window {
   int Initialize();
   GLfloat getBufferWidth() const { return bufferWidth; }
   GLfloat getBufferHeight() const { return bufferHeight; }
-  bool getShouldClose() const { return glfwWindowShouldClose(mainWindow); }
+  int getShouldClose() const { return glfwWindowShouldClose(mainWindow); }
   void swapBuffers() { glfwSwapBuffers(mainWindow); }
 
  private:

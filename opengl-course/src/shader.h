@@ -14,11 +14,11 @@ class Shader {
   void CreateFromFiles(const std::string* vertexLocation,
                        const std::string* fragmentLocation);
 
-  std::string ReadFile(const std::string* fileLocation);
+  static std::string ReadFile(const std::string* fileLocation);
 
-  GLuint GetProjectionLocation();
-  GLuint GetModelLocation();
-  void UseShader();
+  GLuint GetProjectionLocation() const;
+  GLuint GetModelLocation() const;
+  void UseShader() const;
   void ClearShader();
 
  private:
@@ -27,8 +27,8 @@ class Shader {
   GLuint uniformModel;
   void CompileShader(const std::string* vertexCode,
                      const std::string* fragmentCode);
-  void AddShader(GLuint theProgram, const std::string* shaderCode,
-                 GLenum shaderType);
+  static void AddShader(GLuint theProgram, const std::string* shaderCode,
+                        GLenum shaderType);
 };
 
 #endif  // SHADER_H

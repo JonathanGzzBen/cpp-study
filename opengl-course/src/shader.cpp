@@ -9,11 +9,11 @@ Shader::Shader() : shaderId{0}, uniformProjection{0}, uniformModel{0} {}
 
 Shader::~Shader() { ClearShader(); }
 
-GLuint Shader::GetProjectionLocation() { return uniformProjection; }
+GLuint Shader::GetProjectionLocation() const { return uniformProjection; }
 
-GLuint Shader::GetModelLocation() { return uniformModel; }
+GLuint Shader::GetModelLocation() const { return uniformModel; }
 
-void Shader::UseShader() { glUseProgram(shaderId); }
+void Shader::UseShader() const { glUseProgram(shaderId); }
 
 void Shader::ClearShader() {
   if (shaderId != 0) {
@@ -45,7 +45,7 @@ std::string Shader::ReadFile(const std::string* fileLocation) {
     return "";
   }
 
-  std::string line{""};
+  std::string line;
   while (!fileStream.eof()) {
     std::getline(fileStream, line);
     content += line + "\n";
@@ -58,7 +58,7 @@ std::string Shader::ReadFile(const std::string* fileLocation) {
 void Shader::CompileShader(const std::string* vertexCode,
                            const std::string* fragmentCode) {
   shaderId = glCreateProgram();
-  if (!shaderId) {
+  if (shaderId == 0U) {
     std::cerr << "Error creating shader program\n";
     exit(EXIT_FAILURE);
   }
@@ -70,7 +70,7 @@ void Shader::CompileShader(const std::string* vertexCode,
   std::array<GLchar, 1024> eLog{};
   glLinkProgram(shaderId);
   glGetProgramiv(shaderId, GL_LINK_STATUS, &result);
-  if (!result) {
+  if (result == 0) {
     glGetProgramInfoLog(shaderId, sizeof(eLog), nullptr, eLog.data());
     std::cerr << "Error linking program: '" << eLog.data() << "'\n";
     exit(EXIT_FAILURE);
@@ -78,7 +78,7 @@ void Shader::CompileShader(const std::string* vertexCode,
 
   glValidateProgram(shaderId);
   glGetProgramiv(shaderId, GL_VALIDATE_STATUS, &result);
-  if (!result) {
+  if (result == 0) {
     glGetProgramInfoLog(shaderId, sizeof(eLog), nullptr, eLog.data());
     std::cerr << "Error validating program: '" << eLog.data() << "'\n";
     exit(EXIT_FAILURE);
@@ -92,13 +92,13 @@ void Shader::AddShader(GLuint theProgram, const std::string* shaderCode,
                        GLenum shaderType) {
   GLuint theShader = glCreateShader(shaderType);
   std::array<GLint, 1> codeLength{(GLint)shaderCode->length()};
-  auto theCode = shaderCode->data();
+  const auto* theCode = shaderCode->data();
   glShaderSource(theShader, 1, &theCode, codeLength.data());
   glCompileShader(theShader);
 
   GLint result = 0;
   glGetShaderiv(theShader, GL_COMPILE_STATUS, &result);
-  if (!result) {
+  if (result == 0) {
     std::array<GLchar, 1024> eLog{};
     glGetShaderInfoLog(theShader, eLog.size(), nullptr, eLog.data());
     std::cerr << "Error compiling the " << shaderType << " shader: "

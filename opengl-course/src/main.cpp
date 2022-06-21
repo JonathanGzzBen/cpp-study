@@ -15,10 +15,7 @@
 #include "shader.h"
 #include "window.h"
 
-// Window dimensions
-const GLint WIDTH = 800;
-const GLint HEIGHT = 600;
-const float TO_RADIANS{3.14159265f / 180.0f};
+const float TO_RADIANS{3.14159265F / 180.0F};
 
 Window mainWindow;
 std::vector<Mesh *> meshList;
@@ -33,8 +30,8 @@ const static std::string F_SHADER{"shaders/shader.frag"};
 // Return VAO
 void CreateObjects() {
   std::array<unsigned int, 12> indices{0, 3, 1, 1, 3, 2, 2, 3, 0, 0, 1, 2};
-  std::array<float, 12> vertices{-1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f,
-                                 1.0f,  -1.0f, 0.0f, 0.0f, 1.0f,  0.0f};
+  std::array<float, 12> vertices{-1.0F, -1.0F, 0.0F, 0.0F, -1.0F, 1.0F,
+                                 1.0F,  -1.0F, 0.0F, 0.0F, 1.0F,  0.0F};
 
   Mesh *obj1 = new Mesh();
   obj1->CreateMesh(vertices.data(), indices.data(), 12, 12);
@@ -52,6 +49,9 @@ void CreateShaders() {
 }
 
 int main() {
+  // Window dimensions
+  const GLint WIDTH = 800;
+  const GLint HEIGHT = 600;
   mainWindow = Window(WIDTH, HEIGHT);
   mainWindow.Initialize();
 
@@ -61,34 +61,13 @@ int main() {
   GLuint uniformProjection = 0;
   GLuint uniformModel = 0;
   glm::mat4 projection = glm::perspective(
-      45.0f, mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f,
-      100.0f);
+      45.0F, mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1F,
+      100.0F);
 
-  bool direction = true;
-  float triOffset = 0.0f;
-  float curAngle = 0.0f;
-  float curSize = 0.4f;
-  bool sizeDirection = true;
   // Loop until window closed
-  while (!mainWindow.getShouldClose()) {
-    const float triMaxOffset = 0.6f;
-    const float triIncrement = 0.005f;
+  while (mainWindow.getShouldClose() == 0) {
     // Get and Handle user input events
     glfwPollEvents();
-
-    triOffset += direction ? triIncrement : triIncrement * -1;
-
-    if (std::fabs(triOffset) >= triMaxOffset) {
-      direction = !direction;
-    }
-
-    curAngle = curAngle >= 360 ? curAngle - 360 : curAngle + 0.1f;
-
-    const float maxSize = 0.8F;
-    const float minSize = 0.1F;
-
-    curSize = direction ? curSize + 0.001f : curSize - 0.001f;
-    sizeDirection = (curSize < minSize || maxSize < curSize) == !sizeDirection;
 
     // Clear window
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
@@ -98,20 +77,17 @@ int main() {
     uniformModel = shaderList[0]->GetModelLocation();
     uniformProjection = shaderList[0]->GetProjectionLocation();
 
-    glm::mat4 model(1.0f);
-    model = glm::translate(model, glm::vec3(triOffset, 0.0f, -2.5f));
-    // model =
-    // glm::rotate(model, curAngle * TO_RADIANS, glm::vec3(triOffset, 1.0f,
-    // 0.0f));
-    model = glm::scale(model, glm::vec3(0.4, 0.4, 1.0f));
+    glm::mat4 model(1.0F);
+    model = glm::translate(model, glm::vec3(0.0F, 0.0F, -2.5F));
+    model = glm::scale(model, glm::vec3(0.4F, 0.4F, 1.0F));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
                        glm::value_ptr(projection));
     meshList[0]->RenderMesh();
 
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-triOffset, 1.0f, -2.5f));
-    model = glm::scale(model, glm::vec3(0.4, 0.4, 1.0f));
+    model = glm::mat4(1.0F);
+    model = glm::translate(model, glm::vec3(0.0F, 1.0F, -2.5F));
+    model = glm::scale(model, glm::vec3(0.4F, 0.4F, 1.0F));
     glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
     meshList[1]->RenderMesh();
 
