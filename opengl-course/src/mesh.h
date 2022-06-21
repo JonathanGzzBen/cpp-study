@@ -9,7 +9,7 @@ class Mesh {
   ~Mesh();
 
   void CreateMesh(GLfloat *vertices, unsigned int *indices,
-                  unsigned int numOfVertices, unsigned int numOfIndices);
+                  GLsizei numOfVertices, GLsizei numOfIndices);
   void RenderMesh() const;
   void ClearMesh();
 

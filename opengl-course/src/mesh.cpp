@@ -5,7 +5,7 @@ Mesh::Mesh() : vao{0}, vbo{0}, ibo{0}, indexCount{0} {}
 Mesh::~Mesh() { ClearMesh(); }
 
 void Mesh::CreateMesh(GLfloat *vertices, unsigned int *indices,
-                      unsigned int numOfVertices, unsigned int numOfIndices) {
+                      GLsizei numOfVertices, GLsizei numOfIndices) {
   indexCount = numOfIndices;
 
   glGenVertexArrays(1, &vao);

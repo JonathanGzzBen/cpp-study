@@ -16,15 +16,15 @@ class Shader {
 
   static std::string ReadFile(const std::string* fileLocation);
 
-  GLuint GetProjectionLocation() const;
-  GLuint GetModelLocation() const;
+  GLint GetProjectionLocation() const;
+  GLint GetModelLocation() const;
   void UseShader() const;
   void ClearShader();
 
  private:
   GLuint shaderId;
-  GLuint uniformProjection;
-  GLuint uniformModel;
+  GLint uniformProjection;
+  GLint uniformModel;
   void CompileShader(const std::string* vertexCode,
                      const std::string* fragmentCode);
   static void AddShader(GLuint theProgram, const std::string* shaderCode,

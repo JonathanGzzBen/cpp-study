@@ -9,9 +9,9 @@ Shader::Shader() : shaderId{0}, uniformProjection{0}, uniformModel{0} {}
 
 Shader::~Shader() { ClearShader(); }
 
-GLuint Shader::GetProjectionLocation() const { return uniformProjection; }
+GLint Shader::GetProjectionLocation() const { return uniformProjection; }
 
-GLuint Shader::GetModelLocation() const { return uniformModel; }
+GLint Shader::GetModelLocation() const { return uniformModel; }
 
 void Shader::UseShader() const { glUseProgram(shaderId); }
 
@@ -30,10 +30,10 @@ void Shader::CreateFromString(const std::string* vertexCode,
 }
 
 void Shader::CreateFromFiles(const std::string* vertexLocation,
-        const std::string* fragmentLocation) {
-    std::string vertexString = ReadFile(vertexLocation);
-    std::string fragmentString = ReadFile(fragmentLocation);
-    CompileShader(&vertexString, &fragmentString);
+                             const std::string* fragmentLocation) {
+  std::string vertexString = ReadFile(vertexLocation);
+  std::string fragmentString = ReadFile(fragmentLocation);
+  CompileShader(&vertexString, &fragmentString);
 }
 
 std::string Shader::ReadFile(const std::string* fileLocation) {
@@ -91,7 +91,7 @@ void Shader::CompileShader(const std::string* vertexCode,
 void Shader::AddShader(GLuint theProgram, const std::string* shaderCode,
                        GLenum shaderType) {
   GLuint theShader = glCreateShader(shaderType);
-  std::array<GLint, 1> codeLength{(GLint)shaderCode->length()};
+  std::array<GLint, 1> codeLength{static_cast<GLint>(shaderCode->length())};
   const auto* theCode = shaderCode->data();
   glShaderSource(theShader, 1, &theCode, codeLength.data());
   glCompileShader(theShader);

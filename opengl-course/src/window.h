@@ -11,16 +11,16 @@ class Window {
   ~Window();
 
   int Initialize();
-  GLfloat getBufferWidth() const { return bufferWidth; }
-  GLfloat getBufferHeight() const { return bufferHeight; }
+  GLint getBufferWidth() const { return bufferWidth; }
+  GLint getBufferHeight() const { return bufferHeight; }
   int getShouldClose() const { return glfwWindowShouldClose(mainWindow); }
   void swapBuffers() { glfwSwapBuffers(mainWindow); }
 
  private:
-  GLFWwindow *mainWindow;
+  GLFWwindow *mainWindow{nullptr};
   GLint width;
   GLint height;
-  GLint bufferWidth;
-  GLint bufferHeight;
+  GLint bufferWidth{0};
+  GLint bufferHeight{0};
 };
 #endif  // WINDOW_H

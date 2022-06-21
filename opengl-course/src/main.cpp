@@ -8,6 +8,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -17,9 +18,8 @@
 
 const float TO_RADIANS{3.14159265F / 180.0F};
 
-Window mainWindow;
-std::vector<Mesh *> meshList;
-std::vector<Shader *> shaderList;
+std::vector<std::shared_ptr<Mesh>> meshList;
+std::vector<std::shared_ptr<Shader>> shaderList;
 
 // Vector shader
 const static std::string V_SHADER{"shaders/shader.vert"};
@@ -33,36 +33,38 @@ void CreateObjects() {
   std::array<float, 12> vertices{-1.0F, -1.0F, 0.0F, 0.0F, -1.0F, 1.0F,
                                  1.0F,  -1.0F, 0.0F, 0.0F, 1.0F,  0.0F};
 
-  Mesh *obj1 = new Mesh();
+  auto obj1 = std::make_shared<Mesh>();
   obj1->CreateMesh(vertices.data(), indices.data(), 12, 12);
   meshList.push_back(obj1);
 
-  Mesh *obj2 = new Mesh();
+  auto obj2 = std::make_shared<Mesh>();
   obj2->CreateMesh(vertices.data(), indices.data(), 12, 12);
   meshList.push_back(obj2);
 }
 
 void CreateShaders() {
-  Shader *shader1 = new Shader();
-  shader1->CreateFromFiles(&V_SHADER, &F_SHADER);
-  shaderList.push_back(shader1);
+  auto shader = std::make_shared<Shader>();
+  shader->CreateFromFiles(&V_SHADER, &F_SHADER);
+  shaderList.push_back(shader);
 }
 
 int main() {
   // Window dimensions
   const GLint WIDTH = 800;
   const GLint HEIGHT = 600;
-  mainWindow = Window(WIDTH, HEIGHT);
+  Window mainWindow{WIDTH, HEIGHT};
   mainWindow.Initialize();
 
   CreateObjects();
   CreateShaders();
 
-  GLuint uniformProjection = 0;
-  GLuint uniformModel = 0;
-  glm::mat4 projection = glm::perspective(
-      45.0F, mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1F,
-      100.0F);
+  GLint uniformProjection = 0;
+  GLint uniformModel = 0;
+  glm::mat4 projection =
+      glm::perspective(45.0F,
+                       static_cast<GLfloat>(mainWindow.getBufferWidth()) /
+                           static_cast<GLfloat>(mainWindow.getBufferHeight()),
+                       0.1F, 100.0F);
 
   // Loop until window closed
   while (mainWindow.getShouldClose() == 0) {
