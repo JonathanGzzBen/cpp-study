@@ -1,0 +1,3 @@
+C:/Users/jonat/Documents/Programming/Cpp/cpp-study/opengl-course/build/CMakeFiles/main.dir
+C:/Users/jonat/Documents/Programming/Cpp/cpp-study/opengl-course/build/CMakeFiles/edit_cache.dir
+C:/Users/jonat/Documents/Programming/Cpp/cpp-study/opengl-course/build/CMakeFiles/rebuild_cache.dir

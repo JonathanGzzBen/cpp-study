@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.22.3)
+cmake_minimum_required(VERSION 3.20.3)
 project(opengl-course)
+
+include_directories(${CMAKE_SOURCE_DIR}/src)
 
 # OpenGL
 find_package(OpenGL REQUIRED)
@@ -14,5 +16,6 @@ include_directories(${GLEW_INCLUDE_DIR})
 # GLM
 find_package(glm)
 
-add_executable(main src/main.cpp)
+add_executable(main src/main.cpp src/mesh.cpp src/shader.cpp src/window.cpp)
+set_property(TARGET main PROPERTY CXX_STANDARD 20)
 target_link_libraries(main OpenGL::GL glfw GLEW::GLEW glm)
