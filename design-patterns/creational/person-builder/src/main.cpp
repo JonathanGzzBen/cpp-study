@@ -1,16 +1,18 @@
 #include <iostream>
 #include <string>
 
+#include "job.h"
+#include "job_builder.h"
 #include "person.h"
-
-struct Address {
-  std::string country;
-  std::string street_addres;
-  int post_code;
-};
+#include "person_builder.h"
 
 int main() {
-  auto person = Person::create().is_called("Jonathan").has_age(20);
+  auto person =
+      Person::create()
+          .is_called("Jonathan")
+          .age_in_years(21)
+          .works(Job::create().at("Banregio").as_a("Software Developer"))
+          .build();
   std::cout << person << std::endl;
   return 0;
 }

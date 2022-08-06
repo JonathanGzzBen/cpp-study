@@ -1,31 +1,30 @@
 #ifndef PERSON_H
 #define PERSON_H
 
+#include <memory>
 #include <ostream>
 #include <string>
+
+#include "job.h"
+
+class PersonBuilder;
 
 class Person {
  private:
   std::string name;
   int age;
+  Job job;
+
+  Person() : name{""}, age{0}, job{} {}
 
  public:
-  class Builder {
-   private:
-    std::string name = "";
-    int age = 0;
+  static PersonBuilder create();
 
-   public:
-    Builder& is_called(std::string name);
-    Builder& has_age(int years);
-    Person build() { return Person(*this); }
-    friend class Person;
-  };
+  inline std::string GetName() const { return name; }
+  inline int GetAge() const { return age; }
+  inline Job GetJob() const { return job; }
 
-  Person(Builder builder) : name{builder.name}, age{builder.age} {}
-
-  static Builder create() { return Builder{}; }
-
+  friend class PersonBuilder;
   friend std::ostream& operator<<(std::ostream& os, const Person& dt);
 };
 

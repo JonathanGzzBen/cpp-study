@@ -1,18 +1,18 @@
 #include "person.h"
 
-static Person::Builder create() { return Person::Builder{}; }
+#include <string>
 
-Person::Builder& Person::Builder::is_called(std::string name) {
-  this->name = name;
-  return *this;
-}
+#include "person_builder.h"
 
-Person::Builder& Person::Builder::has_age(int years) {
-  this->age = years;
-  return *this;
-}
+PersonBuilder Person::create() { return PersonBuilder(); }
 
 std::ostream& operator<<(std::ostream& os, const Person& person) {
   os << "Name: " << person.name << "\nAge: " << person.age;
+  if (person.job.GetPlace().length() != 0) {
+    os << "\nWorks at: " << person.job.GetPlace();
+  }
+  if (person.job.GetRole().length() != 0) {
+    os << "\nRole: " << person.job.GetRole();
+  }
   return os;
 }
