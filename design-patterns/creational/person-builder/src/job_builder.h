@@ -4,18 +4,18 @@
 #include "job.h"
 
 class JobBuilder {
- private:
+private:
   Job job;
 
- public:
+public:
   JobBuilder() {}
 
-  JobBuilder& place(std::string place) {
+  JobBuilder &place(std::string place) {
     job.place = place;
     return *this;
   }
 
-  JobBuilder& role(std::string role) {
+  JobBuilder &role(std::string role) {
     job.role = role;
     return *this;
   }
@@ -24,4 +24,4 @@ class JobBuilder {
   operator Job() const { return std::move(job); }
 };
 
-#endif  // JOB_BUILDER_H
+#endif // JOB_BUILDER_H

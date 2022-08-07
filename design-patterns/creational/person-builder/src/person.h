@@ -10,22 +10,22 @@
 class PersonBuilder;
 
 class Person {
- private:
+private:
   std::string name;
   int age;
-  Job job;
+  Job *job;
 
-  Person() : name{""}, age{0}, job{} {}
+  Person() : name{""}, age{0}, job{nullptr} {}
 
- public:
+public:
   static PersonBuilder create();
 
   inline std::string GetName() const { return name; }
   inline int GetAge() const { return age; }
-  inline Job GetJob() const { return job; }
+  inline Job GetJob() const { return *job; }
 
   friend class PersonBuilder;
-  friend std::ostream& operator<<(std::ostream& os, const Person& dt);
+  friend std::ostream &operator<<(std::ostream &os, const Person &dt);
 };
 
-#endif  // PERSON_H
+#endif // PERSON_H

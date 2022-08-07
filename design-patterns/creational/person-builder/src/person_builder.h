@@ -1,26 +1,32 @@
 #ifndef PERSON_BUILDER_H
 #define PERSON_BUILDER_H
 #include "person.h"
+#include <memory>
 
 class PersonBuilder {
- private:
+private:
   Person person;
 
- public:
-  PersonBuilder(Person& p) : person{p} {}
+public:
+  PersonBuilder(Person &p) : person{p} {}
   PersonBuilder() {}
 
-  PersonBuilder& name(std::string name) {
+  PersonBuilder &name(std::string name) {
     person.name = name;
     return *this;
   }
 
-  PersonBuilder& age(int years) {
+  PersonBuilder &age(int years) {
     person.age = years;
     return *this;
   }
 
-  PersonBuilder& job(Job job) {
+  PersonBuilder &job(Job job) {
+    person.job = new Job{job};
+    return *this;
+  }
+
+  PersonBuilder &job(Job *job) {
     person.job = job;
     return *this;
   }
@@ -29,4 +35,4 @@ class PersonBuilder {
   operator Person() const { return std::move(person); }
 };
 
-#endif  // PERSON_BUILDER_H
+#endif // PERSON_BUILDER_H

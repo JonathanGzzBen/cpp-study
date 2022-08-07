@@ -4,22 +4,23 @@
 #include <string>
 
 class JobBuilder;
+class PersonBuilder;
 
 class Job {
- private:
+private:
   std::string place;
   std::string role;
 
   Job() : place{""}, role{""} {}
 
- public:
+public:
   static JobBuilder create();
 
   inline std::string GetPlace() const { return place; }
   inline std::string GetRole() const { return role; }
 
   friend class JobBuilder;
-  friend class Person;
+  friend class PersonBuilder;
 };
 
-#endif  // JOB_H
+#endif // JOB_H
