@@ -1,5 +1,7 @@
 #ifndef PERSON_BUILDER_H
 #define PERSON_BUILDER_H
+#include "job.h"
+#include "job_builder.h"
 #include "person.h"
 #include <memory>
 
@@ -22,12 +24,12 @@ public:
   }
 
   PersonBuilder &job(Job job) {
-    person.job = new Job{job};
+    person.job = std::make_shared<Job>(JobBuilder{job}.build());
     return *this;
   }
 
   PersonBuilder &job(Job *job) {
-    person.job = job;
+    person.job = std::make_shared<Job>(JobBuilder(*job).build());
     return *this;
   }
 

@@ -1,6 +1,7 @@
 #ifndef PERSON_H
 #define PERSON_H
 
+#include <iostream>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -13,12 +14,11 @@ class Person {
 private:
   std::string name;
   int age;
-  Job *job;
+  std::shared_ptr<Job> job;
 
   Person() : name{""}, age{0}, job{nullptr} {}
 
 public:
-  ~Person() { delete job; }
   static PersonBuilder create();
 
   inline std::string GetName() const { return name; }

@@ -9,6 +9,7 @@ private:
 
 public:
   JobBuilder() {}
+  JobBuilder(Job &job) : job{job} {}
 
   JobBuilder &place(std::string place) {
     job.place = place;

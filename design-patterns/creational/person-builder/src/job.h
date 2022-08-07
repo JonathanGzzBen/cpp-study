@@ -1,6 +1,7 @@
 #ifndef JOB_H
 #define JOB_H
 
+#include <iostream>
 #include <string>
 
 class JobBuilder;
