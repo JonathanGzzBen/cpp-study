@@ -18,6 +18,7 @@ private:
   Person() : name{""}, age{0}, job{nullptr} {}
 
 public:
+  ~Person() { delete job; }
   static PersonBuilder create();
 
   inline std::string GetName() const { return name; }
