@@ -10,12 +10,12 @@ class JobBuilder {
  public:
   JobBuilder() {}
 
-  JobBuilder& at(std::string place) {
+  JobBuilder& place(std::string place) {
     job.place = place;
     return *this;
   }
 
-  JobBuilder& as_a(std::string role) {
+  JobBuilder& role(std::string role) {
     job.role = role;
     return *this;
   }

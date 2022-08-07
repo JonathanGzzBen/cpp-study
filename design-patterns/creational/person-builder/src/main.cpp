@@ -9,9 +9,9 @@
 int main() {
   auto person =
       Person::create()
-          .is_called("Jonathan")
-          .age_in_years(21)
-          .works(Job::create().at("Banregio").as_a("Software Developer"))
+          .name("Jonathan")
+          .age(21)
+          .job(Job::create().place("Banregio").role("Software Developer"))
           .build();
   std::cout << person << std::endl;
   return 0;
