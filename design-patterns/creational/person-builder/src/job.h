@@ -21,7 +21,6 @@ public:
   inline std::string GetRole() const { return role; }
 
   friend class JobBuilder;
-  friend class PersonBuilder;
 };
 
 #endif // JOB_H
