@@ -101,7 +101,16 @@ int main() {
   glCreateBuffers(number_of_vbos, VBOs);
   glNamedBufferStorage(VBOs[vertices_vbo], sizeof(vertices), vertices, 0);
 
+  /* Use program */
   glUseProgram(program);
+
+  /* Set uniform values */
+  const auto colorUniformLocation = glGetUniformLocation(program, "color");
+  std::cout << glewGetErrorString(glGetError()) << "\n";
+  static const float colorValue[] = {0.5f, 0.4f, 0.8f, 1.0f};
+  glUniform4fv(colorUniformLocation, 1, colorValue);
+
+  /* Set up VAO */
   const unsigned int triangles_vao = 0;
   const unsigned int number_of_vaos = 1;
   unsigned int VAOs[number_of_vaos];
@@ -116,8 +125,8 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
     /* Render here */
     //    glClear(GL_COLOR_BUFFER_BIT);
-    static const float black[] = {1.0f, 0.0f, 0.0f, 0.0f};
-    glClearBufferfv(GL_COLOR, 0, black);
+    static const float red[] = {1.0f, 0.0f, 0.0f, 0.0f};
+    glClearBufferfv(GL_COLOR, 0, red);
     glBindVertexArray(VAOs[triangles_vao]);
     glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
