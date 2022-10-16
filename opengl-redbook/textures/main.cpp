@@ -106,17 +106,21 @@ static auto GetTexture(const std::string& filename) {
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   int width;
   int height;
   int channels;
-  const auto data = stbi_load(filename.c_str(), &width, &height, &channels, 0);
+  const auto data = stbi_load(filename.c_str(), &width, &height, &channels, 4);
   if (!data) {
     std::cerr << "Could not load texture file " << filename << "\n";
     exit(EXIT_FAILURE);
   }
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+  if (width % 4 != 0) {
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  }
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
   stbi_image_free(data);
@@ -134,7 +138,7 @@ static auto GetSquareVAO(const unsigned int program) {
   auto square_bo = GetSquareBufferObjects();
   glBindBuffer(GL_ARRAY_BUFFER, square_bo.vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_bo.ebo);
-  glBindTexture(GL_TEXTURE_2D, GetTexture("textures/nino-profile.jpg"));
+  glBindTexture(GL_TEXTURE_2D, GetTexture("textures/nero.jpg"));
 
   /* Attribs */
   unsigned int position_loc = glGetAttribLocation(program, "vPosition");
