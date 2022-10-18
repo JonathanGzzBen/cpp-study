@@ -150,11 +150,12 @@ static auto GetSquareVAO(const unsigned int program) {
   glVertexAttribPointer(color_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7,
                         (void*)(sizeof(float) * 2));
 
-  glVertexAttribPointer(color_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7,
+  glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7,
                         (void*)(sizeof(float) * 5));
 
   glEnableVertexAttribArray(position_loc);
   glEnableVertexAttribArray(color_loc);
+  glEnableVertexAttribArray(tex_coord_loc);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -167,7 +168,7 @@ int main() {
 
   /* Create a windowed mode window and its OpenGL context */
   GLFWwindow* window =
-      glfwCreateWindow(640, 480, "Hello World", nullptr, nullptr);
+      glfwCreateWindow(700, 700, "Hello World", nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -175,6 +176,7 @@ int main() {
 
   /* Make the window's context current */
   glfwMakeContextCurrent(window);
+  std::cout << "Using version " << glfwGetVersionString() << "\n";
 
   GLenum err = glewInit();
   if (GLEW_OK != err) {
@@ -193,6 +195,10 @@ int main() {
 
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window)) {
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    int frame_side_size = (width < height) ? width : height;
+    glViewport(0, 0, frame_side_size, frame_side_size);
     /* Render here */
     static const float black[] = {0.0f, 0.0f, 0.0f, 0.0f};
     glClearBufferfv(GL_COLOR, 0, black);
