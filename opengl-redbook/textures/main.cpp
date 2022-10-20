@@ -173,6 +173,12 @@ static auto GetSquareVAO(const unsigned int program) {
   return vao;
 }
 
+static auto framebuffer_size_callback(GLFWwindow* window, int width,
+                                      int height) {
+  int frame_side_size = (width < height) ? width : height;
+  glViewport(0, 0, frame_side_size, frame_side_size);
+}
+
 int main() {
   /* Initialize the library */
   if (!glfwInit()) return -1;
@@ -187,6 +193,7 @@ int main() {
 
   /* Make the window's context current */
   glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   std::cout << "Using version " << glfwGetVersionString() << "\n";
 
   GLenum err = glewInit();
@@ -206,10 +213,6 @@ int main() {
 
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window)) {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    int frame_side_size = (width < height) ? width : height;
-    glViewport(0, 0, frame_side_size, frame_side_size);
     /* Render here */
     static const float black[] = {0.0f, 0.0f, 0.0f, 0.0f};
     glClearBufferfv(GL_COLOR, 0, black);
