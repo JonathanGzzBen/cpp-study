@@ -47,8 +47,8 @@ static unsigned int LoadShader(unsigned int type, const std::string& filename) {
   return shader;
 }
 
-unsigned int CompileProgram(const std::string& vertex_shader_filename,
-                            const std::string& fragment_shader_filename) {
+static auto CompileProgram(const std::string& vertex_shader_filename,
+                           const std::string& fragment_shader_filename) {
   const auto vertex_shader =
       LoadShader(GL_VERTEX_SHADER, vertex_shader_filename);
 
@@ -100,7 +100,7 @@ static auto GetSquareBufferObjects() {
   return FigureBufferObjects{.vbo = vbo, .ebo = ebo};
 }
 
-static auto GetTexture(const std::string& filename) {
+static auto GetAndBindTexture(const std::string& filename) {
   unsigned int texture;
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
@@ -124,8 +124,17 @@ static auto GetTexture(const std::string& filename) {
                GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
   stbi_image_free(data);
-  glBindTexture(GL_TEXTURE_2D, 0);
   return texture;
+}
+
+static auto BindImageToTexture2D(unsigned int program,
+                                 const std::string& filename,
+                                 unsigned int texture_unit_index,
+                                 const std::string& texture_uniform_name) {
+  glActiveTexture(GL_TEXTURE0 + texture_unit_index);
+  GetAndBindTexture(filename);
+  glUniform1i(glGetUniformLocation(program, texture_uniform_name.c_str()),
+              static_cast<int>(texture_unit_index));
 }
 
 static auto GetSquareVAO(const unsigned int program) {
@@ -138,7 +147,9 @@ static auto GetSquareVAO(const unsigned int program) {
   auto square_bo = GetSquareBufferObjects();
   glBindBuffer(GL_ARRAY_BUFFER, square_bo.vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_bo.ebo);
-  glBindTexture(GL_TEXTURE_2D, GetTexture("textures/nero.jpg"));
+
+  BindImageToTexture2D(program, "textures/nero.jpg", 0, "image_texture");
+  BindImageToTexture2D(program, "textures/nino.png", 1, "watermark_texture");
 
   /* Attribs */
   unsigned int position_loc = glGetAttribLocation(program, "vPosition");
