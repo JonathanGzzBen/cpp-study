@@ -84,11 +84,11 @@ static auto GetSquareBufferObjects() {
   glCreateBuffers(1, &vbo);
   /* Store vertices in a vertex buffer object */
   const float vertices[] = {
-      // positions          // colors                      // texture coords
-      -0.9f, 0.9f,  1.0f, 0.0f, 0.0f, 0.0,  0.0f,  // top left
-      0.9f,  0.9f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // top right
-      -0.9f, -0.9f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // bottom left
-      0.9f,  -0.9f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f   // bottom right
+      // positions        // colors   // texture coords
+      -0.9f, 0.9f,  1.0f, 0.0f, 0.0f, 0.0,  1.0f,  // top left
+      0.9f,  0.9f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // top right
+      -0.9f, -0.9f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
+      0.9f,  -0.9f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f   // bottom right
   };
   glNamedBufferStorage(vbo, sizeof(vertices), vertices, 0);
 
@@ -148,6 +148,7 @@ static auto GetSquareVAO(const unsigned int program) {
   glBindBuffer(GL_ARRAY_BUFFER, square_bo.vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_bo.ebo);
 
+  stbi_set_flip_vertically_on_load(true);
   BindImageToTexture2D(program, "textures/nero.jpg", 0, "image_texture");
   BindImageToTexture2D(program, "textures/nino.png", 1, "watermark_texture");
 
