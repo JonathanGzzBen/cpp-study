@@ -241,6 +241,20 @@ int main() {
   const auto projection_matrix_location =
       glGetUniformLocation(program, "mProjection");
 
+  const auto cube_positions_location =
+      glGetUniformLocation(program, "vCubePositions");
+
+  const auto identity_matrix = glm::mat4(1.0f);
+  glm::mat4 cube_positions[] = {
+      glm::translate(identity_matrix, glm::vec3(0.0f, 0.0f, 0.0f)),
+      glm::translate(identity_matrix, glm::vec3(0.2f, 0.2f, 0.2f)),
+  };
+  
+  constexpr auto instances_count = sizeof(cube_positions) / sizeof(glm::mat4);
+  glUniformMatrix4fv(cube_positions_location,
+                     instances_count, GL_FALSE,
+                     glm::value_ptr(cube_positions[0]));
+
   glEnable(GL_DEPTH_TEST);
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window)) {
@@ -273,7 +287,8 @@ int main() {
     glUniformMatrix4fv(projection_matrix_location, 1, GL_FALSE,
                        glm::value_ptr(projection_matrix));
 
-    glDrawElements(GL_TRIANGLE_STRIP, 17, GL_UNSIGNED_INT, nullptr);
+    // glDrawElements(GL_TRIANGLE_STRIP, 17, GL_UNSIGNED_INT, nullptr);
+    glDrawElementsInstanced(GL_TRIANGLE_STRIP, 17, GL_UNSIGNED_INT, nullptr, instances_count);
 
     /* Swap front and back VBOs */
     glfwSwapBuffers(window);
