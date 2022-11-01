@@ -2,8 +2,7 @@
 
 layout (location = 0) in vec4 vPosition;
 layout (location = 1) in vec2 vTexCoord;
-
-uniform mat4 vCubePositions[2];
+layout (location = 2) in vec4 vCubePosition;
 
 uniform mat4 mTransform;
 uniform mat4 mModel;
@@ -14,6 +13,7 @@ out vec3 squareColor;
 out vec2 texCoord;
 
 void main() {
-    gl_Position = mProjection * mView * mModel * vCubePositions[gl_InstanceID] * mTransform * vPosition;
+    mat4 mViewModel = mView * mModel;
+    gl_Position = mProjection * mViewModel * vec4(vPosition + vCubePosition);
     texCoord = vTexCoord;
 }
