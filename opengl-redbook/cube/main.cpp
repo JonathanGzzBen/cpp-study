@@ -92,11 +92,12 @@ static auto GetSquareBufferObjects() {
   glCreateBuffers(1, &vbo);
   /* Store vertices in a vertex buffer object */
   const float vertices[] = {
-      // positions  // texture coords
-      -0.9f, 0.9f,  0.0,  1.0f,  // top left
-      0.9f,  0.9f,  1.0f, 1.0f,  // top right
-      -0.9f, -0.9f, 0.0f, 0.0f,  // bottom left
-      0.9f,  -0.9f, 1.0f, 0.0f,   // bottom right
+      // Front face
+      // positions        // texture coords
+      -0.5f, 0.5f,  0.0f, 0.0,  1.0f,  // top left
+      0.5f,  0.5f,  0.0f, 1.0f, 1.0f,  // top right
+      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
+      0.5f,  -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
   };
   glNamedBufferStorage(vbo, sizeof(vertices), vertices, 0);
 
@@ -164,11 +165,11 @@ static auto GetSquareVAO(const unsigned int program) {
   unsigned int position_loc = glGetAttribLocation(program, "vPosition");
   unsigned int tex_coord_loc = glGetAttribLocation(program, "vTexCoord");
 
-  glVertexAttribPointer(position_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4,
+  glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
                         nullptr);
 
-  glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4,
-                        (void*)(sizeof(float) * 2));
+  glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
+                        (void*)(sizeof(float) * 3));
 
   glEnableVertexAttribArray(position_loc);
   glEnableVertexAttribArray(tex_coord_loc);
@@ -227,12 +228,13 @@ int main() {
   model_matrix = glm::rotate(model_matrix, glm::radians(-55.0f),
                              glm::vec3(1.0f, 0.0f, 0.0f));
   auto view_matrix = glm::mat4(1.0f);
-  view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -1.0f));
+  view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -0.5f));
   auto projection_matrix = glm::mat4(1.0f);
   projection_matrix =
       glm::perspective(glm::radians(45.0f), 700.0f / 700.0f, 0.1f, 100.0f);
 
-  const auto transform_matrix_location = glGetUniformLocation(program, "mTransform");
+  const auto transform_matrix_location =
+      glGetUniformLocation(program, "mTransform");
   const auto model_matrix_location = glGetUniformLocation(program, "mModel");
   const auto view_matrix_location = glGetUniformLocation(program, "mView");
   const auto projection_matrix_location =
