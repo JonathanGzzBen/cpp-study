@@ -94,17 +94,30 @@ static auto GetSquareBufferObjects() {
   const float vertices[] = {
       // Front face
       // positions        // texture coords
-      -0.5f, 0.5f,  0.0f, 0.0,  1.0f,  // top left
-      0.5f,  0.5f,  0.0f, 1.0f, 1.0f,  // top right
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
-      0.5f,  -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
+      -0.5f, 0.5f,  0.5f,  0.0,  1.0f,  // 0 front top left
+      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  // 1 front top right
+      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,  // 2 front bottom left
+      0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,  // 3 front bottom right
+      -0.5f, 0.5f,  -0.5f, 0.0,  1.0f,  // 4 back top left
+      0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,  // 5 back top right
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // 6 back bottom left
+      0.5f,  -0.5f, -0.5f, 1.0f, 0.0f,  // 7 back bottom right
   };
   glNamedBufferStorage(vbo, sizeof(vertices), vertices, 0);
 
   unsigned int ebo;
   glCreateBuffers(1, &ebo);
   /* Set up element array buffer */
-  const unsigned int indices[] = {0, 1, 2, 3};
+  glEnable(GL_PRIMITIVE_RESTART);
+  glPrimitiveRestartIndex(0xFFFF);
+  const unsigned int indices[] = {
+      0,      1, 2, 3,     // front face
+      0xFFFF, 4, 5, 6, 7,   // back face
+      0xFFFF, 2, 3, 6, 7,  // bottom face
+      0xFFFF, 0, 1, 4, 5,  // top face
+      0xFFFF, 0, 2, 4, 6,  // left face
+      0xFFFF, 1, 3, 5, 7  // left face
+  };
   glNamedBufferStorage(ebo, sizeof(indices), indices, 0);
   return FigureBufferObjects{.vbo = vbo, .ebo = ebo};
 }
@@ -222,17 +235,6 @@ int main() {
 
   const unsigned int square_vao = GetSquareVAO(program);
 
-  auto transform_matrix = glm::mat4(1.0f);
-  transform_matrix = glm::scale(transform_matrix, glm::vec3(0.3f, 0.3f, 1.0f));
-  auto model_matrix = glm::mat4(1.0f);
-  model_matrix = glm::rotate(model_matrix, glm::radians(-55.0f),
-                             glm::vec3(1.0f, 0.0f, 0.0f));
-  auto view_matrix = glm::mat4(1.0f);
-  view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -0.5f));
-  auto projection_matrix = glm::mat4(1.0f);
-  projection_matrix =
-      glm::perspective(glm::radians(45.0f), 700.0f / 700.0f, 0.1f, 100.0f);
-
   const auto transform_matrix_location =
       glGetUniformLocation(program, "mTransform");
   const auto model_matrix_location = glGetUniformLocation(program, "mModel");
@@ -240,14 +242,28 @@ int main() {
   const auto projection_matrix_location =
       glGetUniformLocation(program, "mProjection");
 
+  glEnable(GL_DEPTH_TEST);
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
     /* Render here */
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(square_vao);
+
+    auto transform_matrix = glm::mat4(1.0f);
+    transform_matrix =
+        glm::scale(transform_matrix, glm::vec3(0.3f, 0.3f, 0.3f));
+    auto model_matrix = glm::mat4(1.0f);
+    model_matrix =
+        glm::rotate(model_matrix, (float)glfwGetTime() * glm::radians(50.0f),
+                    glm::vec3(0.5f, 0.5f, 0.0f));
+    auto view_matrix = glm::mat4(1.0f);
+    view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -0.8f));
+    auto projection_matrix = glm::mat4(1.0f);
+    projection_matrix =
+        glm::perspective(glm::radians(45.0f), 700.0f / 700.0f, 0.1f, 100.0f);
 
     glUniformMatrix4fv(transform_matrix_location, 1, GL_FALSE,
                        glm::value_ptr(transform_matrix));
@@ -258,7 +274,7 @@ int main() {
     glUniformMatrix4fv(projection_matrix_location, 1, GL_FALSE,
                        glm::value_ptr(projection_matrix));
 
-    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLE_STRIP, 30, GL_UNSIGNED_INT, nullptr);
 
     /* Swap front and back VBOs */
     glfwSwapBuffers(window);

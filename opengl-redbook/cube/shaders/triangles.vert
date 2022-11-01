@@ -1,7 +1,7 @@
 #version 450 core
 
 layout (location = 0) in vec4 vPosition;
-layout (location = 2) in vec2 vTexCoord;
+layout (location = 1) in vec2 vTexCoord;
 
 uniform mat4 mTransform;
 uniform mat4 mModel;
