@@ -111,12 +111,10 @@ static auto GetSquareBufferObjects() {
   glEnable(GL_PRIMITIVE_RESTART);
   glPrimitiveRestartIndex(0xFFFF);
   const unsigned int indices[] = {
-      0,      1, 2, 3,     // front face
-      0xFFFF, 4, 5, 6, 7,   // back face
-      0xFFFF, 2, 3, 6, 7,  // bottom face
-      0xFFFF, 0, 1, 4, 5,  // top face
-      0xFFFF, 0, 2, 4, 6,  // left face
-      0xFFFF, 1, 3, 5, 7  // left face
+
+      4,      5, 0, 1, 2, 3, 6, 7,  // First strip
+      0xFFFF,                       // Restart
+      0,      2, 4, 6, 5, 7, 1, 3,  // Second strip
   };
   glNamedBufferStorage(ebo, sizeof(indices), indices, 0);
   return FigureBufferObjects{.vbo = vbo, .ebo = ebo};
@@ -274,7 +272,7 @@ int main() {
     glUniformMatrix4fv(projection_matrix_location, 1, GL_FALSE,
                        glm::value_ptr(projection_matrix));
 
-    glDrawElements(GL_TRIANGLE_STRIP, 30, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLE_STRIP, 17, GL_UNSIGNED_INT, nullptr);
 
     /* Swap front and back VBOs */
     glfwSwapBuffers(window);
