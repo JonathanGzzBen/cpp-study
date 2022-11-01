@@ -108,7 +108,9 @@ static auto GetSquareBufferObjects() {
   unsigned int ebo;
   glCreateBuffers(1, &ebo);
   /* Set up element array buffer */
-  glEnable(GL_PRIMITIVE_RESTART);
+  if (!glIsEnabled(GL_PRIMITIVE_RESTART)) {
+    glEnable(GL_PRIMITIVE_RESTART);
+  }
   glPrimitiveRestartIndex(0xFFFF);
   const unsigned int indices[] = {
 
