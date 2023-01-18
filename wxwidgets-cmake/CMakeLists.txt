@@ -16,10 +16,19 @@ add_executable(${PROJECT_NAME} WIN32 src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME} wx::core wx::base wx::net)
 
+if(WIN32)
+	# Manifest required on Windows, more information on:
+	# https://docs.wxwidgets.org/latest/plat_msw_install.html#msw_manifest
+	target_sources(${PROJECT_NAME} PRIVATE ${wxWidgets_SOURCE_DIR}/include/wx/msw/wx.rc)
+endif()
 
+
+# Use wxBUILD_SHARED = OFF to build a single .exe file
 if (wxBUILD_SHARED)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
-	COMMAND_EXPAND_LISTS
+	# Copy runtime required DLLs to the build directory
+	add_custom_command(
+		TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+		COMMAND_EXPAND_LISTS
 	)
 endif()
