@@ -18,6 +18,7 @@ class Shader {
 
   GLint GetProjectionLocation() const;
   GLint GetModelLocation() const;
+  GLint GetViewLocation() const;
   void UseShader() const;
   void ClearShader();
 
@@ -25,6 +26,7 @@ class Shader {
   GLuint shaderId;
   GLint uniformProjection;
   GLint uniformModel;
+  GLint uniformView;
   void CompileShader(const std::string* vertexCode,
                      const std::string* fragmentCode);
   static void AddShader(GLuint theProgram, const std::string* shaderCode,

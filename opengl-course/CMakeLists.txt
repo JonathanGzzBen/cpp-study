@@ -29,7 +29,7 @@ FetchContent_MakeAvailable(glfw glew glm)
 # OpenGL
 find_package(OpenGL REQUIRED)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/mesh.cpp src/shader.cpp src/window.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/mesh.cpp src/shader.cpp src/window.cpp src/camera.cpp)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 target_include_directories(${PROJECT_NAME} PRIVATE ${glew_SOURCE_DIR}/include)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL glfw glew_s glm)
