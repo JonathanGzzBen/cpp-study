@@ -12,80 +12,31 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/fwd.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#define STB_IMAGE_IMPLEMENTATION
+#include "program_object.h"
+#include "shader_object.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "stb/stbi_image.h"
-
-std::string load_source_file(const std::string& filename) {
-  std::ifstream input_file{filename};
-  if (!input_file.is_open()) {
-    std::cerr << "Error opening file " << filename << "\n";
-    exit(EXIT_FAILURE);
-  }
-
-  std::string file_content;
-  while (input_file.good()) {
-    std::string buf;
-    std::getline(input_file, buf);
-    file_content += buf + "\n";
-  }
-
-  return file_content;
-}
-
-static unsigned int LoadShader(unsigned int type, const std::string& filename) {
-  /* Create shader */
-  const auto shader = glCreateShader(type);
-  std::string shader_source_str{load_source_file(filename)};
-
-  const char* shader_src = shader_source_str.c_str();
-  glShaderSource(shader, 1, &shader_src, nullptr);
-  glCompileShader(shader);
-  int compile_status;
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
-  if (compile_status != GL_TRUE) {
-    int log_length;
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
-    std::string log;
-    log.resize(log_length);
-    glGetShaderInfoLog(shader, GL_INFO_LOG_LENGTH, &log_length, log.data());
-    std::cout << log;
-    exit(EXIT_FAILURE);
-  }
-  return shader;
-}
+#include "texture.h"
 
 static auto CompileProgram(const std::string& vertex_shader_filename,
                            const std::string& fragment_shader_filename) {
   const auto vertex_shader =
-      LoadShader(GL_VERTEX_SHADER, vertex_shader_filename);
+      ShaderObject(GL_VERTEX_SHADER, vertex_shader_filename);
 
   const auto fragment_shader =
-      LoadShader(GL_FRAGMENT_SHADER, fragment_shader_filename);
+      ShaderObject(GL_FRAGMENT_SHADER, fragment_shader_filename);
 
   /* Create program */
-  auto program = glCreateProgram();
-  glAttachShader(program, vertex_shader);
-  glAttachShader(program, fragment_shader);
-  glLinkProgram(program);
-  int link_status;
-  glGetProgramiv(program, GL_LINK_STATUS, &link_status);
-  if (link_status != GL_TRUE) {
-    int log_length;
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
-    std::string log;
-    log.resize(log_length);
-    glGetProgramInfoLog(program, GL_INFO_LOG_LENGTH, &log_length, log.data());
-    std::cout << log;
-    exit(EXIT_FAILURE);
-  }
-  return program;
+  ProgramObject program;
+  program.AttachShader(vertex_shader);
+  program.AttachShader(fragment_shader);
+  program.LinkProgram();
+  return program.GetReference();
 }
 
 using FigureBufferObjects = struct {
-  unsigned int vbo;
-  unsigned int ebo;
+  BufferObject vbo;
+  BufferObject ebo;
 };
 
 static auto GetSquareBufferObjects() {
@@ -131,36 +82,8 @@ static auto GetSquareBufferObjects() {
       0,      2, 4, 6, 5, 7, 1, 3,  // Second strip
   };
   BufferObject ebo((void*)indices, sizeof(indices));
-  
-  return FigureBufferObjects{.vbo = vbo.GetBufferName(),
-                             .ebo = ebo.GetBufferName()};
-}
 
-static auto GetAndBindTexture(const std::string& filename) {
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  int width;
-  int height;
-  int channels;
-  const auto data = stbi_load(filename.c_str(), &width, &height, &channels, 4);
-  if (!data) {
-    std::cerr << "Could not load texture file " << filename << "\n";
-    exit(EXIT_FAILURE);
-  }
-  if (width % 4 != 0) {
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  }
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-  stbi_image_free(data);
-  return texture;
+  return FigureBufferObjects{.vbo = vbo, .ebo = ebo};
 }
 
 static auto BindImageToTexture2D(unsigned int program,
@@ -168,7 +91,7 @@ static auto BindImageToTexture2D(unsigned int program,
                                  unsigned int texture_unit_index,
                                  const std::string& texture_uniform_name) {
   glActiveTexture(GL_TEXTURE0 + texture_unit_index);
-  GetAndBindTexture(filename);
+  Texture texture(filename);
   glUniform1i(glGetUniformLocation(program, texture_uniform_name.c_str()),
               static_cast<int>(texture_unit_index));
 }
@@ -181,8 +104,8 @@ static auto GetSquareVAO(const unsigned int program) {
 
   /* Bind VBO with vertex data and EBO with indices */
   auto square_bo = GetSquareBufferObjects();
-  glBindBuffer(GL_ARRAY_BUFFER, square_bo.vbo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_bo.ebo);
+  glBindBuffer(GL_ARRAY_BUFFER, square_bo.vbo.GetBufferName());
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_bo.ebo.GetBufferName());
 
   stbi_set_flip_vertically_on_load(true);
   BindImageToTexture2D(program, "textures/nero.jpg", 0, "image_texture");

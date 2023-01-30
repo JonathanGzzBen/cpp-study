@@ -13,7 +13,7 @@ class BufferObject {
   }
   ~BufferObject() = default;
 
-  auto GetBufferName() -> unsigned int { return buffer_name; }
+  auto GetBufferName() const -> unsigned int { return buffer_name; }
 };
 
 #endif  // BUFFER_OBJECT_H
