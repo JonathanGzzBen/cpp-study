@@ -6,6 +6,7 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "buffer_object.h"
+#include "callbacks.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -17,6 +18,7 @@
 #include "program_object.h"
 #include "shader_object.h"
 #include "texture.h"
+#include "window.h"
 
 static auto CompileProgram(const std::string& vertex_shader_filename,
                            const std::string& fragment_shader_filename) {
@@ -138,70 +140,37 @@ static auto framebuffer_size_callback(GLFWwindow* window, int width,
 }
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+// glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-static auto processInput(GLFWwindow* window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
+static auto processInput(Window* window) {
+  // if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+  // glfwSetWindowShouldClose(window, true);
+  if (window->GetKey(GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    window->SetShouldClose(true);
   float currentFrame = (float)glfwGetTime();
   deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
   const float cameraSpeed = 2.5f * deltaTime;
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    cameraPos += cameraSpeed * cameraFront;
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    cameraPos -= cameraSpeed * cameraFront;
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    cameraPos -=
-        glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    cameraPos +=
-        glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-}
-
-bool firstMouse = true;
-float lastX = 350;
-float lastY = 350;
-float yaw = -90.0f;
-float pitch = 0.0f;
-void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
-  if (firstMouse) {
-    lastX = static_cast<float>(xPos);
-    lastY = static_cast<float>(yPos);
-    firstMouse = false;
-  }
-
-  float xOffset = static_cast<float>(xPos) - lastX;
-  float yOffset = lastY - static_cast<float>(yPos);
-  lastX = static_cast<float>(xPos);
-  lastY = static_cast<float>(yPos);
-
-  float sensitivity = 0.1f;
-  xOffset *= sensitivity;
-  yOffset *= sensitivity;
-
-  yaw += xOffset;
-  pitch += yOffset;
-
-  pitch = (pitch > 89.0f) ? 89.0f : pitch;
-  pitch = (pitch < -89.0f) ? -89.0f : pitch;
-
-  glm::vec3 direction;
-  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  direction.y = sin(glm::radians(pitch));
-  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-  cameraFront = glm::normalize(direction);
-}
-
-float fov = 45.0f;
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-  fov -= (float)yoffset;
-  if (fov < 1.0f) fov = 1.0f;
-  if (fov > 45.0f) fov = 45.0f;
+  // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+  if (window->GetKey(GLFW_KEY_W) == GLFW_PRESS)
+    cameraPos += cameraSpeed * Callbacks::CursorPos::cameraFront;
+  // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+  if (window->GetKey(GLFW_KEY_S) == GLFW_PRESS)
+    cameraPos -= cameraSpeed * Callbacks::CursorPos::cameraFront;
+  // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+  if (window->GetKey(GLFW_KEY_A) == GLFW_PRESS)
+    cameraPos -= glm::normalize(
+                     glm::cross(Callbacks::CursorPos::cameraFront, cameraUp)) *
+                 cameraSpeed;
+  // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+  if (window->GetKey(GLFW_KEY_D) == GLFW_PRESS)
+    cameraPos += glm::normalize(
+                     glm::cross(Callbacks::CursorPos::cameraFront, cameraUp)) *
+                 cameraSpeed;
 }
 
 int main() {
@@ -209,16 +178,11 @@ int main() {
   if (!glfwInit()) return -1;
 
   /* Create a windowed mode window and its OpenGL context */
-  GLFWwindow* window =
-      glfwCreateWindow(700, 700, CMAKE_PROJECT_NAME, nullptr, nullptr);
-  if (!window) {
-    glfwTerminate();
-    return -1;
-  }
+  Window window{700, 700, CMAKE_PROJECT_NAME};
 
   /* Make the window's context current */
-  glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  window.MakeContextCurrent();
+  window.SetFramebufferSizeCallback(Callbacks::FramebufferSize::ResizeViewport);
   std::cout << "Using version " << glfwGetVersionString() << "\n";
 
   GLenum err = glewInit();
@@ -248,12 +212,12 @@ int main() {
   constexpr auto instances_count = 9;
 
   glEnable(GL_DEPTH_TEST);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  glfwSetCursorPosCallback(window, mouse_callback);
-  glfwSetScrollCallback(window, scroll_callback);
+  window.SetInputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  window.SetCursorPosCallback(Callbacks::CursorPos::MouseCallback);
+  window.SetScrollCallback(Callbacks::Scroll::ScrollCallback);
   /* Loop until the user closes the window */
-  while (!glfwWindowShouldClose(window)) {
-    processInput(window);
+  while (!window.GetShouldClose()) {
+    window.ProcessInput(processInput);
     /* Render here */
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -267,11 +231,12 @@ int main() {
     const auto camX = sin(glfwGetTime()) * radius;
     const auto camZ = cos(glfwGetTime()) * radius;
     auto view_matrix = glm::mat4(1.0f);
-    view_matrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    view_matrix = glm::lookAt(
+        cameraPos, cameraPos + Callbacks::CursorPos::cameraFront, cameraUp);
 
     auto projection_matrix = glm::mat4(1.0f);
-    projection_matrix =
-        glm::perspective(glm::radians(fov), 700.0f / 700.0f, 0.1f, 100.0f);
+    projection_matrix = glm::perspective(glm::radians(Callbacks::Scroll::fov),
+                                         700.0f / 700.0f, 0.1f, 100.0f);
 
     glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE,
                        glm::value_ptr(model_matrix));
@@ -284,7 +249,7 @@ int main() {
                             instances_count);
 
     /* Swap front and back VBOs */
-    glfwSwapBuffers(window);
+    window.SwapBuffers();
 
     /* Poll for and process events */
     glfwPollEvents();
