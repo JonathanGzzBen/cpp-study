@@ -15,7 +15,7 @@ class ProgramObject {
   }
   ~ProgramObject() = default;
 
-  auto AttachShader(ShaderObject shader) const {
+  auto AttachShader(const ShaderObject shader) const -> void {
     glAttachShader(reference, shader.GetReference());
   }
 
@@ -36,6 +36,11 @@ class ProgramObject {
   }
 
   auto GetReference() const -> unsigned int { return reference; }
+  auto Use() const -> void { glUseProgram(reference); }
+
+  auto GetUniformLocation(const std::string& name) const -> int {
+    return glGetUniformLocation(reference, name.c_str());
+  }
 };
 
 #endif  // PROGRAM_OBJECT_H

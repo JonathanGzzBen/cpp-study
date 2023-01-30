@@ -11,11 +11,11 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/fwd.hpp"
+#include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "program_object.h"
 #include "shader_object.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "texture.h"
 
 static auto CompileProgram(const std::string& vertex_shader_filename,
@@ -233,18 +233,19 @@ int main() {
     exit(EXIT_FAILURE);
   }
 
-  const auto program =
-      CompileProgram("shaders/triangles.vert", "shaders/triangles.frag");
+  ProgramObject program;
+  program.AttachShader(
+      ShaderObject(GL_VERTEX_SHADER, "shaders/triangles.vert"));
+  program.AttachShader(
+      ShaderObject(GL_FRAGMENT_SHADER, "shaders/triangles.frag"));
+  program.LinkProgram();
+  program.Use();
+  const auto square_vao = GetSquareVAO(program.GetReference());
 
-  /* Use program */
-  glUseProgram(program);
-
-  const unsigned int square_vao = GetSquareVAO(program);
-
-  const auto model_matrix_location = glGetUniformLocation(program, "mModel");
-  const auto view_matrix_location = glGetUniformLocation(program, "mView");
+  const auto model_matrix_location = program.GetUniformLocation("mModel");
+  const auto view_matrix_location = program.GetUniformLocation("mView");
   const auto projection_matrix_location =
-      glGetUniformLocation(program, "mProjection");
+      program.GetUniformLocation("mProjection");
 
   const auto identity_matrix = glm::mat4(1.0f);
 
