@@ -146,8 +146,6 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 static auto processInput(Window* window) {
-  // if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-  // glfwSetWindowShouldClose(window, true);
   if (window->GetKey(GLFW_KEY_ESCAPE) == GLFW_PRESS)
     window->SetShouldClose(true);
   float currentFrame = (float)glfwGetTime();
@@ -155,18 +153,14 @@ static auto processInput(Window* window) {
   lastFrame = currentFrame;
 
   const float cameraSpeed = 2.5f * deltaTime;
-  // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
   if (window->GetKey(GLFW_KEY_W) == GLFW_PRESS)
     cameraPos += cameraSpeed * Callbacks::CursorPos::cameraFront;
-  // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
   if (window->GetKey(GLFW_KEY_S) == GLFW_PRESS)
     cameraPos -= cameraSpeed * Callbacks::CursorPos::cameraFront;
-  // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
   if (window->GetKey(GLFW_KEY_A) == GLFW_PRESS)
     cameraPos -= glm::normalize(
                      glm::cross(Callbacks::CursorPos::cameraFront, cameraUp)) *
                  cameraSpeed;
-  // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
   if (window->GetKey(GLFW_KEY_D) == GLFW_PRESS)
     cameraPos += glm::normalize(
                      glm::cross(Callbacks::CursorPos::cameraFront, cameraUp)) *
