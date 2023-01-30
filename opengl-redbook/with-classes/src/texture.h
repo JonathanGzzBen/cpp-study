@@ -5,12 +5,15 @@
 
 class Texture {
  private:
+  unsigned int texture_unit_index;
   unsigned int texture_name;
 
  public:
   /// @brief Creates and binds texture
-  /// @param filename 
-  Texture(const std::string& filename) {
+  /// @param filename
+  Texture(const unsigned int texture_unit_index, const std::string& filename)
+      : texture_unit_index{texture_unit_index} {
+    glActiveTexture(GL_TEXTURE0 + texture_unit_index);
     unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -40,6 +43,9 @@ class Texture {
   ~Texture() = default;
 
   auto GetTextureName() const -> unsigned int { return texture_name; }
+  auto GetTextureUnitIndex() const -> unsigned int {
+    return texture_unit_index;
+  }
 };
 
 #endif  // TEXTURE_H

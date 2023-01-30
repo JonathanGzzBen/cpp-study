@@ -39,7 +39,7 @@ using FigureBufferObjects = struct {
   BufferObject ebo;
 };
 
-static auto GetSquareBufferObjects() {
+static auto GetSquaresBufferObjects() {
   /* Store vertices in a vertex buffer object */
   const float vertices[] = {
       // Front face
@@ -86,36 +86,31 @@ static auto GetSquareBufferObjects() {
   return FigureBufferObjects{.vbo = vbo, .ebo = ebo};
 }
 
-static auto BindImageToTexture2D(unsigned int program,
-                                 const std::string& filename,
-                                 unsigned int texture_unit_index,
-                                 const std::string& texture_uniform_name) {
-  glActiveTexture(GL_TEXTURE0 + texture_unit_index);
-  Texture texture(filename);
-  glUniform1i(glGetUniformLocation(program, texture_uniform_name.c_str()),
-              static_cast<int>(texture_unit_index));
+static auto SetTextures(const ProgramObject program) {
+  stbi_set_flip_vertically_on_load(true);
+  Texture textureNero(0, "textures/nero.jpg");
+  glUniform1i(glGetUniformLocation(program.GetReference(), "image_texture"),
+              static_cast<int>(textureNero.GetTextureUnitIndex()));
+  Texture textureNino(1, "textures/nino.png");
+  glUniform1i(glGetUniformLocation(program.GetReference(), "watermark_texture"),
+              static_cast<int>(textureNino.GetTextureUnitIndex()));
 }
 
-static auto GetSquareVAO(const unsigned int program) {
+static auto GetSquareVAO(const ProgramObject program) {
   /* Create VAO */
   unsigned int vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
   /* Bind VBO with vertex data and EBO with indices */
-  auto square_bo = GetSquareBufferObjects();
-  glBindBuffer(GL_ARRAY_BUFFER, square_bo.vbo.GetBufferName());
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, square_bo.ebo.GetBufferName());
-
-  stbi_set_flip_vertically_on_load(true);
-  BindImageToTexture2D(program, "textures/nero.jpg", 0, "image_texture");
-  BindImageToTexture2D(program, "textures/nino.png", 1, "watermark_texture");
+  auto squares_bo = GetSquaresBufferObjects();
+  glBindBuffer(GL_ARRAY_BUFFER, squares_bo.vbo.GetBufferName());
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, squares_bo.ebo.GetBufferName());
 
   /* Attribs */
-  unsigned int position_loc = glGetAttribLocation(program, "vPosition");
-  unsigned int tex_coord_loc = glGetAttribLocation(program, "vTexCoord");
-  unsigned int cube_position_loc =
-      glGetAttribLocation(program, "vCubePosition");
+  const auto position_loc = program.GetAttribLocation("vPosition");
+  const auto tex_coord_loc = program.GetAttribLocation("vTexCoord");
+  const auto cube_position_loc = program.GetAttribLocation("vCubePosition");
 
   glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
                         nullptr);
@@ -240,7 +235,8 @@ int main() {
       ShaderObject(GL_FRAGMENT_SHADER, "shaders/triangles.frag"));
   program.LinkProgram();
   program.Use();
-  const auto square_vao = GetSquareVAO(program.GetReference());
+  SetTextures(program);
+  const auto square_vao = GetSquareVAO(program);
 
   const auto model_matrix_location = program.GetUniformLocation("mModel");
   const auto view_matrix_location = program.GetUniformLocation("mView");
