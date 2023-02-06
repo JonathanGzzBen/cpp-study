@@ -3,7 +3,7 @@ project(with-classes)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(${PROJECT_NAME} src/main.cpp libs/stb/stbi_image.h)
+add_executable(${PROJECT_NAME} src/main.cpp src/input_handler.cpp libs/stb/stbi_image.h)
 target_compile_definitions(${PROJECT_NAME} PRIVATE CMAKE_PROJECT_NAME="${PROJECT_NAME}")
 target_include_directories(${PROJECT_NAME} PRIVATE libs)
 

@@ -4,10 +4,14 @@
 #include <GL/glew.h>
 
 #include <functional>
+#include <string>
+
+#include "input_handler.h"
 
 class Window {
- private:
+ protected:
   GLFWwindow* window;
+  InputHandler* input_handler;
 
  public:
   Window(const int width, const int height, const std::string& title) {
@@ -16,6 +20,7 @@ class Window {
     if (!window) {
       glfwTerminate();
     }
+    glfwSetWindowUserPointer(window, this);
   }
   ~Window() { glfwDestroyWindow(window); }
 
@@ -27,18 +32,19 @@ class Window {
       -> void {
     glfwSetFramebufferSizeCallback(window, callback);
   }
-  auto SetCursorPosCallback(GLFWcursorposfun callback) const -> void {
-    glfwSetCursorPosCallback(window, callback);
-  }
-  auto SetScrollCallback(GLFWscrollfun callback) const -> void {
-    glfwSetScrollCallback(window, callback);
-  }
   auto GetShouldClose() const -> bool { return glfwWindowShouldClose(window); }
   auto SetShouldClose(bool value) const -> void {
     glfwSetWindowShouldClose(window, value);
   }
-  auto GetKey(int key) const -> int { return glfwGetKey(window, key); }
-  auto ProcessInput(const std::function<void(Window*)>& func) { func(this); }
+  auto SetControls(InputHandler* controls) {
+    this->input_handler = controls;
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+    glfwSetCursorPosCallback(window, controls->CursorPosCallback);
+    glfwSetScrollCallback(window, controls->ScrollCallback);
+    glfwSetKeyCallback(window, controls->KeyCallback);
+  }
+  auto GetControls() -> InputHandler* const { return input_handler; }
+  auto Process(const std::function<void(Window*)>& func) { func(this); }
   auto SwapBuffers() const -> void { glfwSwapBuffers(window); }
 };
 

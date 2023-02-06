@@ -1,7 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <gl/glew.h>
+#include "GL/glew.h"
+#include "glm/glm.hpp"
 
 class Camera {
  private:
@@ -18,7 +19,7 @@ class Camera {
   auto GetPosition() const -> glm::vec3 { return cameraPos; }
   auto GetFront() const -> glm::vec3 { return cameraFront; }
   auto GetUp() const -> glm::vec3 { return cameraUp; }
-  auto SetPosition(glm::vec3 position) { cameraPos = position; }
+  auto SetPosition(glm::vec3 position) -> void { cameraPos = position; }
   auto SetFront(const glm::vec3 front) -> void { cameraFront = front; }
 };
 

@@ -6,7 +6,7 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "buffer_object.h"
-#include "callbacks.h"
+#include "camera.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -15,26 +15,11 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "input_handler.h"
 #include "program_object.h"
 #include "shader_object.h"
 #include "texture.h"
 #include "window.h"
-
-static auto CompileProgram(const std::string& vertex_shader_filename,
-                           const std::string& fragment_shader_filename) {
-  const auto vertex_shader =
-      ShaderObject(GL_VERTEX_SHADER, vertex_shader_filename);
-
-  const auto fragment_shader =
-      ShaderObject(GL_FRAGMENT_SHADER, fragment_shader_filename);
-
-  /* Create program */
-  ProgramObject program;
-  program.AttachShader(vertex_shader);
-  program.AttachShader(fragment_shader);
-  program.LinkProgram();
-  return program.GetReference();
-}
 
 using FigureBufferObjects = struct {
   BufferObject vbo;
@@ -136,35 +121,44 @@ static auto GetSquareVAO(const ProgramObject program) {
 static auto framebuffer_size_callback(GLFWwindow* window, int width,
                                       int height) {
   int frame_side_size = (width < height) ? width : height;
-  glViewport(0, 0, frame_side_size, frame_side_size);
+  glViewport(0, 0, width, height);
 }
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-// glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+static float last_frame = 0.0f;
 
 static auto processInput(Window* window) {
-  if (window->GetKey(GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    window->SetShouldClose(true);
-  float currentFrame = (float)glfwGetTime();
-  deltaTime = currentFrame - lastFrame;
-  lastFrame = currentFrame;
+  const auto input_handler = window->GetControls();
+  if (input_handler->pressed[GLFW_KEY_ESCAPE]) window->SetShouldClose(true);
+  float current_frame = (float)glfwGetTime();
+  float delta_time = current_frame - last_frame;
+  last_frame = current_frame;
 
-  const float cameraSpeed = 2.5f * deltaTime;
-  if (window->GetKey(GLFW_KEY_W) == GLFW_PRESS)
-    cameraPos += cameraSpeed * Callbacks::CursorPos::cameraFront;
-  if (window->GetKey(GLFW_KEY_S) == GLFW_PRESS)
-    cameraPos -= cameraSpeed * Callbacks::CursorPos::cameraFront;
-  if (window->GetKey(GLFW_KEY_A) == GLFW_PRESS)
-    cameraPos -= glm::normalize(
-                     glm::cross(Callbacks::CursorPos::cameraFront, cameraUp)) *
-                 cameraSpeed;
-  if (window->GetKey(GLFW_KEY_D) == GLFW_PRESS)
-    cameraPos += glm::normalize(
-                     glm::cross(Callbacks::CursorPos::cameraFront, cameraUp)) *
-                 cameraSpeed;
+  const float cameraSpeed = 2.5f * delta_time;
+  const auto camera = window->GetControls()->GetCamera();
+  if (input_handler->pressed[GLFW_KEY_W])
+    camera->SetPosition(camera->GetPosition() +
+                        (cameraSpeed * camera->GetFront()));
+  if (input_handler->pressed[GLFW_KEY_S])
+    camera->SetPosition(camera->GetPosition() -
+                        (cameraSpeed * camera->GetFront()));
+  if (input_handler->pressed[GLFW_KEY_A])
+    camera->SetPosition(
+        camera->GetPosition() -
+        (glm::normalize(glm::cross(camera->GetFront(), camera->GetUp())) *
+         cameraSpeed));
+  if (input_handler->pressed[GLFW_KEY_D])
+    camera->SetPosition(
+        camera->GetPosition() +
+        (glm::normalize(glm::cross(camera->GetFront(), camera->GetUp())) *
+         cameraSpeed));
+}
+
+static int window_width = 700;
+static int window_height = 700;
+static auto ResizeViewport(GLFWwindow* window, int width, int height) {
+  window_width = width;
+  window_height = height;
+  glViewport(0, 0, window_width, window_height);
 }
 
 int main() {
@@ -172,11 +166,11 @@ int main() {
   if (!glfwInit()) return -1;
 
   /* Create a windowed mode window and its OpenGL context */
-  Window window{700, 700, CMAKE_PROJECT_NAME};
+  Window window{window_width, window_height, CMAKE_PROJECT_NAME};
 
   /* Make the window's context current */
   window.MakeContextCurrent();
-  window.SetFramebufferSizeCallback(Callbacks::FramebufferSize::ResizeViewport);
+  window.SetFramebufferSizeCallback(ResizeViewport);
   std::cout << "Using version " << glfwGetVersionString() << "\n";
 
   GLenum err = glewInit();
@@ -207,11 +201,12 @@ int main() {
 
   glEnable(GL_DEPTH_TEST);
   window.SetInputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  window.SetCursorPosCallback(Callbacks::CursorPos::MouseCallback);
-  window.SetScrollCallback(Callbacks::Scroll::ScrollCallback);
+  Camera camera;
+  InputHandler input_handler(&camera);
+  window.SetControls(&input_handler);
   /* Loop until the user closes the window */
   while (!window.GetShouldClose()) {
-    window.ProcessInput(processInput);
+    window.Process(processInput);
     /* Render here */
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -221,16 +216,14 @@ int main() {
     auto model_matrix = glm::mat4(1.0f);
     model_matrix = glm::scale(model_matrix, glm::vec3(0.15f, 0.15f, 0.15f));
 
-    constexpr float radius = 1.0f;
-    const auto camX = sin(glfwGetTime()) * radius;
-    const auto camZ = cos(glfwGetTime()) * radius;
-    auto view_matrix = glm::mat4(1.0f);
-    view_matrix = glm::lookAt(
-        cameraPos, cameraPos + Callbacks::CursorPos::cameraFront, cameraUp);
+    auto view_matrix =
+        glm::lookAt(camera.GetPosition(),
+                    camera.GetPosition() + camera.GetFront(), camera.GetUp());
 
-    auto projection_matrix = glm::mat4(1.0f);
-    projection_matrix = glm::perspective(glm::radians(Callbacks::Scroll::fov),
-                                         700.0f / 700.0f, 0.1f, 100.0f);
+    auto projection_matrix = glm::perspective(
+        glm::radians(input_handler.fov),
+        static_cast<float>(window_width) / static_cast<float>(window_height),
+        0.1f, 100.0f);
 
     glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE,
                        glm::value_ptr(model_matrix));
