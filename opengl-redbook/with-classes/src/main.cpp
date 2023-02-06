@@ -19,6 +19,7 @@
 #include "program_object.h"
 #include "shader_object.h"
 #include "texture.h"
+#include "vertex_array_object.h"
 #include "window.h"
 
 using FigureBufferObjects = struct {
@@ -83,45 +84,23 @@ static auto SetTextures(const ProgramObject program) {
               static_cast<int>(textureNino.GetTextureUnitIndex()));
 }
 
-static auto GetSquareVAO(const ProgramObject program) {
-  /* Create VAO */
-  unsigned int vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  /* Bind VBO with vertex data and EBO with indices */
+static auto GetSquaresVAO(const ProgramObject program) -> VertexArrayObject {
   auto squares_bo = GetSquaresBufferObjects();
-  glBindBuffer(GL_ARRAY_BUFFER, squares_bo.vbo.GetBufferName());
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, squares_bo.ebo.GetBufferName());
 
-  /* Attribs */
-  const auto position_loc = program.GetAttribLocation("vPosition");
-  const auto tex_coord_loc = program.GetAttribLocation("vTexCoord");
-  const auto cube_position_loc = program.GetAttribLocation("vCubePosition");
-
-  glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
-                        nullptr);
-
-  glVertexAttribPointer(tex_coord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5,
-                        (void*)(sizeof(float) * 3));
-
-  glVertexAttribPointer(cube_position_loc, 3, GL_FLOAT, GL_FALSE, 0,
-                        (void*)(sizeof(float) * 40));
-
-  glEnableVertexAttribArray(position_loc);
-  glEnableVertexAttribArray(tex_coord_loc);
-  glEnableVertexAttribArray(cube_position_loc);
-  glVertexAttribDivisor(cube_position_loc, 1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  VertexArrayObject vao;
+  vao.BindBuffer(GL_ARRAY_BUFFER, squares_bo.vbo);
+  vao.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, squares_bo.ebo);
+  vao.SetVertexAttribPointer(program.GetAttribLocation("vPosition"), 3,
+                             GL_FLOAT, GL_FALSE, sizeof(float) * 5, nullptr);
+  vao.SetVertexAttribPointer(program.GetAttribLocation("vTexCoord"), 2,
+                             GL_FLOAT, GL_FALSE, sizeof(float) * 5,
+                             (void*)(sizeof(float) * 3));
+  const auto cube_pos_loc = program.GetAttribLocation("vCubePosition");
+  vao.SetVertexAttribPointer(cube_pos_loc, 3, GL_FLOAT, GL_FALSE, 0,
+                             (void*)(sizeof(float) * 40));
+  vao.SetVertexAttribDivisor(cube_pos_loc, 1);
+  vao.Unbind();
   return vao;
-}
-
-static auto framebuffer_size_callback(GLFWwindow* window, int width,
-                                      int height) {
-  int frame_side_size = (width < height) ? width : height;
-  glViewport(0, 0, width, height);
 }
 
 static float last_frame = 0.0f;
@@ -188,7 +167,7 @@ int main() {
   program.LinkProgram();
   program.Use();
   SetTextures(program);
-  const auto square_vao = GetSquareVAO(program);
+  auto square_vao = GetSquaresVAO(program);
 
   const auto model_matrix_location = program.GetUniformLocation("mModel");
   const auto view_matrix_location = program.GetUniformLocation("mView");
@@ -211,7 +190,7 @@ int main() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBindVertexArray(square_vao);
+    square_vao.Bind();
 
     auto model_matrix = glm::mat4(1.0f);
     model_matrix = glm::scale(model_matrix, glm::vec3(0.15f, 0.15f, 0.15f));
