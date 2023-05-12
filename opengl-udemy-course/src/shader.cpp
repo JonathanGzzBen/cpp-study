@@ -22,6 +22,8 @@ GLuint Shader::GetProjectionLocation() const { return uniform_projection; }
 
 GLuint Shader::GetModelLocation() const { return uniform_model; }
 
+GLuint Shader::GetViewLocation() const {return uniform_view;}
+
 void Shader::UseShader() { glUseProgram(shader_id); }
 
 void Shader::ClearShader() {
@@ -31,6 +33,7 @@ void Shader::ClearShader() {
   }
   uniform_model = 0;
   uniform_projection = 0;
+  uniform_view = 0;
 }
 
 std::string Shader::ReadFile(const char* file_location) const {
@@ -83,6 +86,7 @@ void Shader::CompileShader(const char* vertex_code, const char* fragment_code) {
 
   uniform_model = glGetUniformLocation(shader_id, "model");
   uniform_projection = glGetUniformLocation(shader_id, "projection");
+  uniform_view = glGetUniformLocation(shader_id, "view");
 }
 
 void Shader::AddShader(GLuint the_program, const char* shader_code,

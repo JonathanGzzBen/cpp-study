@@ -15,6 +15,7 @@ class Shader {
 
   GLuint GetProjectionLocation() const;
   GLuint GetModelLocation() const;
+  GLuint GetViewLocation() const;
   void UseShader();
   void ClearShader();
 
@@ -22,6 +23,7 @@ class Shader {
   GLuint shader_id = 0;
   GLuint uniform_projection = 0;
   GLuint uniform_model = 0;
+  GLuint uniform_view = 0;
 
   std::string ReadFile(const char* file_location) const;
 
