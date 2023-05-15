@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <string.h>
@@ -12,11 +14,15 @@
 #include "mesh.h"
 #include "my_window.h"
 #include "shader.h"
+#include "texture.h"
 
 Window main_window;
 std::vector<Mesh*> mesh_list;
 std::vector<Shader> shader_list;
 Camera camera;
+
+Texture brick_texture;
+Texture dirt_texture;
 
 GLfloat delta_time = 0.0f;
 GLfloat last_time = 0.0f;
@@ -29,15 +35,21 @@ static const char* fShader = "shaders/shader.frag";
 
 void CreateObjects() {
   unsigned int indices[] = {0, 3, 1, 1, 3, 2, 2, 3, 0, 0, 1, 2};
-  GLfloat vertices[] = {-1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f,
-                        1.0f,  -1.0f, 0.0f, 0.0f, 1.0f,  0.0f};
+  // clang-format off
+  GLfloat vertices[] = {
+  // x      y      z      u
+    -1.0f, -1.0f,  0.0f, 0.0f, 0.0f,
+     0.0f, -1.0f,  1.0f, 0.5f, 0.0f,
+     1.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+     0.0f,  1.0f,  0.0f, 0.5f, 1.0f};
+  // clang-format on
 
   Mesh* obj1 = new Mesh();
-  obj1->CreateMesh(vertices, indices, 12, 12);
+  obj1->CreateMesh(vertices, indices, 20, 12);
   mesh_list.push_back(obj1);
 
   Mesh* obj2 = new Mesh();
-  obj2->CreateMesh(vertices, indices, 12, 12);
+  obj2->CreateMesh(vertices, indices, 20, 12);
   mesh_list.push_back(obj2);
 }
 
@@ -80,7 +92,12 @@ int main() {
   CreateObjects();
   CreateShaders();
   camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-                  -90.0f, 0.0f, 5.0f, 1.0f);
+                  -90.0f, 0.0f, 5.0f, 0.5f);
+
+  brick_texture = Texture("textures/brick.png");
+  brick_texture.LoadTexture();
+  dirt_texture = Texture("textures/dirt.png");
+  dirt_texture.LoadTexture();
 
   GLuint uniform_projection = 0;
   GLuint uniform_model = 0;
@@ -96,7 +113,6 @@ int main() {
     GLfloat now = glfwGetTime();
     delta_time = now - last_time;
     last_time = now;
-
 
     // Get and handle user input events
     glfwPollEvents();
@@ -122,6 +138,7 @@ int main() {
                        glm::value_ptr(projection));
     glUniformMatrix4fv(uniform_view, 1, GL_FALSE,
                        glm::value_ptr(camera.CalculateViewMatrix()));
+    brick_texture.UseTexture();
     mesh_list[0]->RenderMesh();
 
     model = glm::mat4(1);
@@ -130,6 +147,7 @@ int main() {
     glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(uniform_projection, 1, GL_FALSE,
                        glm::value_ptr(projection));
+    dirt_texture.UseTexture();
     mesh_list[1]->RenderMesh();
 
     glUseProgram(0);

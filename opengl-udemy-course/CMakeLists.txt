@@ -3,7 +3,7 @@ project(opengl-udemy-course)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/mesh.cpp src/shader.cpp src/my_window.cpp src/camera.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/mesh.cpp src/shader.cpp src/my_window.cpp src/camera.cpp src/texture.cpp)
 target_compile_definitions(${PROJECT_NAME} PRIVATE CMAKE_PROJECT_NAME="${PROJECT_NAME}")
 
 include(FetchContent)
@@ -48,4 +48,4 @@ FetchContent_MakeAvailable(glfw glew glm)
 find_package(OpenGL REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw glew_s OpenGL::GL)
-target_include_directories(${PROJECT_NAME} PRIVATE ${glew_SOURCE_DIR}/include ${glm_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${glew_SOURCE_DIR}/include ${glm_SOURCE_DIR} libs)
